@@ -1,0 +1,21 @@
+# Secrets
+.env
+
+# Backend
+backend/target/
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+Thumbs.db
+
+# Outil de mise à jour Java (inutile au projet)
+.github/modernize/
