@@ -1,8 +1,11 @@
-# Secrets
+# Secrets (le fichier modèle .env.example, lui, est versionné)
 .env
+.env.*
+!.env.example
 
 # Backend
 backend/target/
+backend/HELP.md
 backend/uploads/*
 !backend/uploads/.gitkeep
 
@@ -10,12 +13,18 @@ backend/uploads/*
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/
+frontend/.sass-cache/
+
+# Journaux
+*.log
+npm-debug.log*
 
 # IDE / OS
 .idea/
 .vscode/
 *.iml
 Thumbs.db
+.DS_Store
 
 # Outil de mise à jour Java (inutile au projet)
 .github/modernize/

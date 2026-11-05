@@ -1,0 +1,185 @@
+// Fond de page bleu (règle globale : le fond appartient à <body>, pas au composant)
+::ng-deep body.auth-blue {
+  background: linear-gradient(160deg, #0b1d4a 0%, #1747b5 55%, #2f7bea 100%) !important;
+  background-attachment: fixed !important;
+  min-height: 100vh;
+}
+
+// Le bandeau du haut devient transparent pour laisser voir le dégradé de la page
+.auth-hero {
+  background: transparent;
+}
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  margin-bottom: 1rem;
+  border-radius: 18px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+
+  svg { width: 34px; height: 34px; }
+}
+
+.auth-card {
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(50, 50, 93, 0.18) !important;
+}
+
+.auth-title {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #32325d;
+}
+
+.auth-subtitle {
+  margin-bottom: 1.75rem;
+  font-size: 0.9rem;
+  color: #8898aa;
+}
+
+.field {
+  margin-bottom: 1.25rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #525f7f;
+
+    .optional { font-weight: 400; color: #adb5bd; }
+  }
+
+  .control { position: relative; }
+
+  .icon {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    transform: translateY(-50%);
+    color: #8898aa;
+    pointer-events: none;
+  }
+
+  input {
+    width: 100%;
+    height: 46px;
+    padding: 0 46px;
+    font-size: 0.95rem;
+    color: #32325d;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &::placeholder { color: #adb5bd; }
+
+    &:focus {
+      outline: none;
+      border-color: #5e72e4;
+      box-shadow: 0 0 0 3px rgba(94, 114, 228, 0.18);
+    }
+
+    &.invalid {
+      border-color: #f5365c;
+      box-shadow: 0 0 0 3px rgba(245, 54, 92, 0.12);
+    }
+  }
+
+  .control:focus-within .icon { color: #5e72e4; }
+
+  .toggle {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    padding: 6px;
+    transform: translateY(-50%);
+    color: #8898aa;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    line-height: 0;
+
+    svg { width: 18px; height: 18px; }
+    &:hover { color: #5e72e4; }
+  }
+
+  .msg {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.78rem;
+    color: #f5365c;
+  }
+}
+
+.strength {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+
+  .bars {
+    display: flex;
+    flex: 1;
+    gap: 4px;
+    margin-right: 0.75rem;
+
+    span {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: #e9ecef;
+      transition: background 0.2s ease;
+    }
+
+    &.level-1 span:nth-child(-n+1) { background: #f5365c; }
+    &.level-2 span:nth-child(-n+2) { background: #fb6340; }
+    &.level-3 span:nth-child(-n+3) { background: #ffd600; }
+    &.level-4 span:nth-child(-n+4) { background: #2dce89; }
+  }
+
+  small {
+    min-width: 72px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #8898aa;
+  }
+}
+
+.btn-submit {
+  width: 100%;
+  height: 48px;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(87deg, #1d4ed8 0, #2f7bea 100%);
+box-shadow: 0 4px 12px rgba(29, 78, 216, 0.4);
+  border: 0;
+  border-radius: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(94, 114, 228, 0.4);
+  }
+
+  &:disabled { opacity: 0.7; cursor: not-allowed; }
+}
+
+.auth-switch {
+  margin: 1.5rem 0 0;
+  font-size: 0.88rem;
+  text-align: center;
+  color: #8898aa;
+
+  a { font-weight: 600; color: #5e72e4; }
+}

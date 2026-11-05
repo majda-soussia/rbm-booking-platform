@@ -1,0 +1,90 @@
+<div class="header auth-hero py-7 py-lg-8">
+  <div class="container">
+    <div class="header-body text-center mb-7">
+      <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-6">
+          <span class="auth-brand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <path d="M16 2v4M8 2v4M3 10h18"/>
+              <path d="m9 16 2 2 4-4"/>
+            </svg>
+          </span>
+          <h1 class="text-white mb-1">Room &amp; Event Booking</h1>
+          <p class="text-lead text-light">Réservez et gérez vos salles en toute simplicité.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mt--8 pb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-5 col-md-7">
+      <div class="card auth-card shadow border-0">
+        <div class="card-body px-lg-5 py-lg-5">
+
+          <h2 class="auth-title">Connexion</h2>
+          <p class="auth-subtitle">Entrez vos identifiants pour accéder à votre espace.</p>
+
+          <form #f="ngForm" (ngSubmit)="f.valid && submit()" novalidate>
+
+            <div class="alert alert-danger py-2" role="alert" *ngIf="error">{{ error }}</div>
+
+            <div class="field">
+              <label for="email">Adresse email</label>
+              <div class="control">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>
+                </svg>
+                <input id="email" name="email" type="email" placeholder="nom@exemple.com"
+                       autocomplete="username" [(ngModel)]="model.email" #email="ngModel" required email
+                       [class.invalid]="f.submitted && email.invalid">
+              </div>
+              <small class="msg" *ngIf="f.submitted && email.invalid">Une adresse email valide est obligatoire.</small>
+            </div>
+
+            <div class="field">
+              <label for="password">Mot de passe</label>
+              <div class="control">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                </svg>
+                <input id="password" name="password" [type]="showPassword ? 'text' : 'password'"
+                       placeholder="Votre mot de passe" autocomplete="current-password"
+                       [(ngModel)]="model.password" #password="ngModel" required
+                       [class.invalid]="f.submitted && password.invalid">
+                <button type="button" class="toggle" (click)="showPassword = !showPassword"
+                        [attr.aria-label]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+                  <svg *ngIf="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                       stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>
+                  </svg>
+                  <svg *ngIf="showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                       stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.9 10.9 0 0 1 12 19c-6.5 0-10-7-10-7a18.5 18.5 0 0 1 5.06-5.94"/>
+                    <path d="M9.9 4.24A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19"/>
+                    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/>
+                  </svg>
+                </button>
+              </div>
+              <small class="msg" *ngIf="f.submitted && password.invalid">Le mot de passe est obligatoire.</small>
+            </div>
+
+            <button type="submit" class="btn-submit" [disabled]="loading">
+              <span class="spinner-border spinner-border-sm mr-2" *ngIf="loading" role="status" aria-hidden="true"></span>
+              {{ loading ? 'Connexion en cours...' : 'Se connecter' }}
+            </button>
+          </form>
+
+          <p class="auth-switch">
+            Pas encore de compte ? <a [routerLink]="['/register']">Créer un compte</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
