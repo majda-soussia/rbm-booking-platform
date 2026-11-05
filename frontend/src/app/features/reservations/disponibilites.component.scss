@@ -1,0 +1,57 @@
+$blue: #1d4ed8;
+
+.lbl {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #8898aa;
+}
+
+.chip {
+  margin: 0 0.4rem 0.4rem 0;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.82rem;
+  color: #525f7f;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover { border-color: $blue; color: $blue; }
+  &.actif { color: #fff; background: $blue; border-color: $blue; }
+}
+
+.duree { margin: 0.5rem 0 0; font-size: 0.85rem; color: #8898aa; }
+
+.resultats { margin-bottom: 1rem; font-size: 0.88rem; font-weight: 600; color: #525f7f; }
+
+.salle-card {
+  overflow: hidden;
+
+  .photo {
+    height: 160px;
+    background: linear-gradient(135deg, #dbe6ff, #eef3ff);
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+
+    .no-photo {
+      display: flex; align-items: center; justify-content: center;
+      height: 100%; font-size: 0.8rem; color: #8da2d8;
+    }
+  }
+
+  .nom { margin-bottom: 0.25rem; font-size: 1.1rem; font-weight: 700; color: #32325d; }
+  .meta { margin-bottom: 0.6rem; font-size: 0.85rem; color: #8898aa; }
+
+  .tag {
+    display: inline-block; margin: 0 0.3rem 0.3rem 0; padding: 0.15rem 0.6rem;
+    font-size: 0.72rem; font-weight: 600; color: $blue; background: #e8efff; border-radius: 6px;
+  }
+
+  .prix { font-size: 1.1rem; font-weight: 700; color: $blue; }
+  .card-footer { border-top: 1px solid #f1f3f9; }
+}

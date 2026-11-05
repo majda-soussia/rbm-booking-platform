@@ -1,0 +1,98 @@
+<div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <h1 class="text-white mb-1">Disponibilités</h1>
+    <p class="text-light mb-0">Trouvez une salle libre sur le créneau de votre choix.</p>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <form (ngSubmit)="rechercher()" #f="ngForm">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label class="lbl" for="date">Date</label>
+            <input id="date" name="date" type="date" class="form-control" [min]="minDate"
+                   [(ngModel)]="model.date" required>
+          </div>
+          <div class="col-md-2 col-6 mb-3">
+            <label class="lbl" for="debut">Début</label>
+            <select id="debut" name="debut" class="form-control" [(ngModel)]="model.debut">
+              <option *ngFor="let t of times" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+          <div class="col-md-2 col-6 mb-3">
+            <label class="lbl" for="fin">Fin</label>
+            <select id="fin" name="fin" class="form-control" [(ngModel)]="model.fin">
+              <option *ngFor="let t of times" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="lbl" for="capacite">Participants</label>
+            <input id="capacite" name="capacite" type="number" min="1" class="form-control"
+                   placeholder="Capacité minimale" [(ngModel)]="model.capacite">
+          </div>
+          <div class="col-md-2 mb-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary btn-block" [disabled]="loading">
+              <span class="spinner-border spinner-border-sm mr-1" *ngIf="loading"></span>
+              Rechercher
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="equipements.length">
+          <span class="lbl d-block mb-2">Équipements souhaités</span>
+          <button type="button" *ngFor="let e of equipements" class="chip"
+                  [class.actif]="equipementIds.has(e.id)" (click)="toggleEquipement(e.id)">
+            {{ e.libelle }}
+          </button>
+        </div>
+
+        <p class="duree" *ngIf="model.date && !validation">
+          Durée : {{ dureeMinutes / 60 | number:'1.0-1' }} h
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+  <ng-container *ngIf="resultats !== null">
+    <p class="resultats">
+      {{ resultats.length }} salle{{ resultats.length > 1 ? 's' : '' }} disponible{{ resultats.length > 1 ? 's' : '' }}
+      le {{ model.date | date:'dd/MM/yyyy' }} de {{ model.debut }} à {{ model.fin }}
+    </p>
+
+    <div class="row">
+      <div class="col-xl-4 col-md-6 mb-4" *ngFor="let s of resultats; trackBy: trackById">
+        <div class="card salle-card h-100">
+          <div class="photo">
+            <img *ngIf="photo(s) as src" [src]="src" [alt]="'Photo de ' + s.nom" loading="lazy">
+            <div class="no-photo" *ngIf="!photo(s)">Photo à venir</div>
+          </div>
+          <div class="card-body">
+            <h3 class="nom">{{ s.nom }}</h3>
+            <p class="meta">{{ s.capacite }} personnes<span *ngIf="s.etage !== null"> · Étage {{ s.etage }}</span></p>
+            <div class="equipements">
+              <span class="tag" *ngFor="let e of s.equipements">{{ e.libelle }}</span>
+            </div>
+          </div>
+          <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+            <div>
+              <div class="prix">{{ prixEstime(s) | number:'1.2-2' }} TND</div>
+              <small class="text-muted">{{ s.tarifHoraire | number:'1.2-2' }} TND / h</small>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" (click)="reserver(s)">Réserver</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" *ngIf="resultats.length === 0">
+        <div class="card"><div class="card-body text-center py-5 text-muted">
+          Aucune salle libre sur ce créneau. Essayez un autre horaire ou retirez un filtre.
+        </div></div>
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -13,4 +13,5 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'icons',          component: IconsComponent },
     { path: 'maps',           component: MapsComponent },
     { path: 'salles', loadChildren: () => import('../../features/salles/salles.module').then(m => m.SallesModule) },
+    { path: 'reservations', loadChildren: () => import('../../features/reservations/reservations.module').then(m => m.ReservationsModule) },
 ];
