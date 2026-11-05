@@ -11,7 +11,8 @@ declare interface RouteInfo {
 }
 export const ROUTES: RouteInfo[] = [
   { path: '/dashboard', title: 'Tableau de bord', icon: 'ni-tv-2 text-primary', class: '' },
-  { path: '/user-profile', title: 'Mon profil', icon: 'ni-single-02 text-yellow', class: '' }
+  { path: '/user-profile', title: 'Mon profil', icon: 'ni-single-02 text-yellow', class: '' },
+  { path: '/salles', title: 'Salles', icon: 'ni-building text-blue', class: '' },
   // à venir : Salles, Disponibilités, Mes réservations, Calendrier  (CLIENT et ADMIN)
   // à venir : Toutes les réservations, Gestion des salles, Équipements, Utilisateurs  (ADMIN)
 ];
