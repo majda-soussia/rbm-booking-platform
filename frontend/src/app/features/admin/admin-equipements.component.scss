@@ -1,0 +1,22 @@
+$blue: #1d4ed8;
+
+.lbl {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #8898aa;
+
+  .opt { font-weight: 400; text-transform: none; color: #adb5bd; }
+}
+
+.resultats { font-size: 0.88rem; font-weight: 600; color: #525f7f; }
+
+.ligne {
+  border-left: 4px solid $blue;
+
+  .nom { font-size: 1rem; font-weight: 700; color: #32325d; }
+  .sous { font-size: 0.85rem; color: #8898aa; }
+}

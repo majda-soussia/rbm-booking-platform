@@ -8,3 +8,11 @@ export interface User {
   prenom: string;
   roles: RoleName[];
 }
+export interface UserRequest {
+  email: string;
+  password?: string;
+  tel?: string | null;
+  nom: string;
+  prenom: string;
+  roles: RoleName[];
+}

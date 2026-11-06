@@ -27,4 +27,5 @@ public interface SalleRepository extends JpaRepository<Salle, Long> {
 
     // Compteur du tableau de bord
     long countByActiveTrue();
+    boolean existsByEquipementsId(Long equipementId);
 }

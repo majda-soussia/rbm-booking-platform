@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.security.core.Authentication;
 import java.util.List;
 
 @RestController
@@ -31,13 +31,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public UserResponse update(@PathVariable Long id, @Valid @RequestBody UserRequest req) {
-        return service.update(id, req);
-    }
+public UserResponse update(@PathVariable Long id, @Valid @RequestBody UserRequest req, Authentication auth) {
+    return service.update(id, req, auth.getName());
+}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+@DeleteMapping("/{id}")
+public ResponseEntity<Void> delete(@PathVariable Long id, Authentication auth) {
+    service.delete(id, auth.getName());
+    return ResponseEntity.noContent().build();
+}
 }

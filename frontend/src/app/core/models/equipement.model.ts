@@ -3,3 +3,7 @@ export interface Equipement {
   libelle: string;
   description: string | null;
 }
+export interface EquipementRequest {
+  libelle: string;
+  description: string | null;
+}

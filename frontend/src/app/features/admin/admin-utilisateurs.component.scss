@@ -1,0 +1,59 @@
+$blue: #1d4ed8;
+
+.lbl {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #8898aa;
+
+  .opt { font-weight: 400; text-transform: none; color: #adb5bd; }
+}
+
+.chip {
+  margin: 0 0.4rem 0.4rem 0;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.82rem;
+  color: #525f7f;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover { border-color: $blue; color: $blue; }
+  &.actif { color: #fff; background: $blue; border-color: $blue; }
+}
+
+.resultats { margin-bottom: 0.75rem; font-size: 0.88rem; font-weight: 600; color: #525f7f; }
+
+.ligne {
+  border-left: 4px solid #dee2e6;
+
+  .nom { font-size: 1rem; font-weight: 700; color: #32325d; }
+  .moi { font-size: 0.78rem; font-weight: 600; color: $blue; }
+  .sous { font-size: 0.83rem; color: #8898aa; word-break: break-all; }
+}
+
+.avatar {
+  display: flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px;
+  font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
+  color: $blue; background: #e8efff; border-radius: 50%;
+}
+
+.role {
+  display: inline-block;
+  margin-right: 0.3rem;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #5b6477;
+  background: #e9ecf3;
+  border-radius: 999px;
+
+  &.admin { color: #fff; background: $blue; }
+}

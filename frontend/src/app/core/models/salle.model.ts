@@ -13,3 +13,14 @@ export interface Salle {
   active: boolean;
   equipements: Equipement[];
 }
+export interface SalleRequest {
+  nom: string;
+  capacite: number;
+  etage: number | null;
+  description: string | null;
+  adresse: string | null;
+  localisationUrl: string | null;
+  tarifHoraire: number;
+  active: boolean;
+  equipementIds: number[];
+}

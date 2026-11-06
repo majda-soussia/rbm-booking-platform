@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.rbm.repository.ReservationRepository;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ReservationRepository reservationRepository;
 
     public List<UserResponse> findAll() {
         return userRepository.findAll().stream().map(this::toResponse).toList();
@@ -53,22 +54,33 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse update(Long id, UserRequest req) {
-        User user = getEntity(id);
-        if (!user.getEmail().equals(req.email()) && userRepository.existsByEmail(req.email())) {
-            throw new BusinessException("Cet email est déjà utilisé : " + req.email());
-        }
-        user.setEmail(req.email());
-        if (req.password() != null && !req.password().isBlank()) {
-            user.setPassword(passwordEncoder.encode(req.password()));
-        }
-        applyCommon(user, req);
-        return toResponse(userRepository.save(user));
+public UserResponse update(Long id, UserRequest req, String callerEmail) {
+    User user = getEntity(id);
+    if (!user.getEmail().equals(req.email()) && userRepository.existsByEmail(req.email())) {
+        throw new BusinessException("Cet email est déjà utilisé : " + req.email());
     }
+    boolean soiMeme = user.getEmail().equalsIgnoreCase(callerEmail);
+    if (soiMeme && req.roles() != null && !req.roles().isEmpty() && !req.roles().contains(ERole.ADMIN)) {
+        throw new BusinessException("Vous ne pouvez pas vous retirer le rôle administrateur.");
+    }
+    user.setEmail(req.email());
+    if (req.password() != null && !req.password().isBlank()) {
+        user.setPassword(passwordEncoder.encode(req.password()));
+    }
+    applyCommon(user, req);
+    return toResponse(userRepository.save(user));
+}
 
     @Transactional
-    public void delete(Long id) {
-        userRepository.delete(getEntity(id));
+    public void delete(Long id, String callerEmail) {
+        User user = getEntity(id);
+        if (user.getEmail().equalsIgnoreCase(callerEmail)) {
+            throw new BusinessException("Vous ne pouvez pas supprimer votre propre compte.");
+        }
+        if (reservationRepository.existsByUserId(id)) {
+            throw new BusinessException("Impossible de supprimer cet utilisateur : il possède des réservations");
+        }
+        userRepository.delete(user);
     }
 
     // ---------- helpers ----------

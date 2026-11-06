@@ -2,8 +2,10 @@ package com.rbm.service;
 
 import com.rbm.dto.EquipementDto;
 import com.rbm.entity.Equipement;
+import com.rbm.exception.BusinessException;
 import com.rbm.exception.ResourceNotFoundException;
 import com.rbm.repository.EquipementRepository;
+import com.rbm.repository.SalleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.List;
 public class EquipementService {
 
     private final EquipementRepository repository;
+    private final SalleRepository salleRepository;
 
     public List<EquipementDto> findAll() {
         return repository.findAll().stream().map(this::toDto).toList();
@@ -38,7 +41,13 @@ public class EquipementService {
     }
 
     public void delete(Long id) {
-        repository.delete(getEntity(id));
+        Equipement e = getEntity(id);
+        if (salleRepository.existsByEquipementsId(id)) {
+            throw new BusinessException(
+                    "Impossible de supprimer cet équipement : il est utilisé par au moins une salle. "
+                            + "Retirez-le d'abord des salles concernées.");
+        }
+        repository.delete(e);
     }
 
     private Equipement getEntity(Long id) {
