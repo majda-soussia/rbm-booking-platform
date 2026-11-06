@@ -3,3 +3,10 @@
   font-weight: 700;
   color: #1d4ed8;
 }
+.logout-link {
+  color: #f5365c !important;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover { background: rgba(245, 54, 92, 0.08); }
+}

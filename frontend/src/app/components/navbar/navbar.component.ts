@@ -35,4 +35,8 @@ export class NavbarComponent implements OnInit {
 logout(): void {
   this.auth.logout();
 }
+get roleLabel(): string {
+  return this.auth.isAdmin ? 'Administrateur' : 'Client';
+}
+
 }

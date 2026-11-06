@@ -17,11 +17,18 @@ export class AuthService {
   /** Utilisateur connecté, ou null. Les composants peuvent s'y abonner. */
   readonly user$: Observable<User | null> = this.userSubject.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private tokens: TokenService,
-    private router: Router
-  ) {}
+  constructor(private http: HttpClient, private tokens: TokenService, private router: Router) {
+  // Déconnexion ou connexion dans un autre onglet : on se met à jour
+  window.addEventListener('storage', (event: StorageEvent) => {
+    if (event.key !== 'rbm_token') { return; }
+    if (!event.newValue) {
+      this.userSubject.next(null);
+      this.router.navigate(['/login']);
+    } else {
+      this.userSubject.next(this.tokens.getUser());
+    }
+  });
+}
 
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.url}/login`, request)
