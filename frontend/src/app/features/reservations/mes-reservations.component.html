@@ -1,0 +1,126 @@
+<div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <h1 class="text-white mb-1">Mes réservations</h1>
+    <p class="text-light mb-0">Suivez vos demandes, annulez-les ou invitez vos participants.</p>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="alert alert-success" *ngIf="info">{{ info }}</div>
+
+  <!-- Filtres par statut -->
+  <div class="card mb-4" *ngIf="!loading">
+    <div class="card-body py-3">
+      <button type="button" *ngFor="let f of filtres" class="onglet"
+              [class.actif]="filtre === f.value" (click)="filtre = f.value">
+        {{ f.label }} <span class="n">{{ compte(f.value) }}</span>
+      </button>
+      <a routerLink="/reservations/disponibilites" class="btn btn-primary btn-sm float-right">
+        Nouvelle réservation
+      </a>
+    </div>
+  </div>
+
+  <div class="text-center py-6" *ngIf="loading">
+    <span class="spinner-border text-primary" role="status"></span>
+  </div>
+
+  <div class="card" *ngIf="!loading && visibles.length === 0">
+    <div class="card-body text-center py-5 text-muted">
+      <p class="mb-3">{{ reservations.length === 0 ? 'Vous n\'avez pas encore de réservation.' : 'Aucune réservation avec ce statut.' }}</p>
+      <a routerLink="/reservations/disponibilites" class="btn btn-primary" *ngIf="reservations.length === 0">
+        Rechercher une salle
+      </a>
+    </div>
+  </div>
+
+  <div class="card resa mb-3" *ngFor="let r of visibles; trackBy: trackById">
+    <div class="card-body">
+      <div class="row align-items-center">
+
+        <div class="col-lg-5 mb-2 mb-lg-0">
+          <h3 class="titre">{{ r.titre }}</h3>
+          <div class="sous">{{ r.salleNom }} · {{ r.type | titlecase }} · {{ r.nbParticipants }} participant{{ r.nbParticipants > 1 ? 's' : '' }}</div>
+        </div>
+
+        <div class="col-lg-3 mb-2 mb-lg-0">
+          <div class="date">{{ r.dateDebut | date:'EEEE dd/MM/yyyy' }}</div>
+          <div class="sous">{{ r.dateDebut | date:'HH:mm' }} – {{ r.dateFin | date:'HH:mm' }}</div>
+        </div>
+
+        <div class="col-lg-2 mb-2 mb-lg-0">
+          <span class="statut" [ngClass]="r.statut">{{ libelle(r.statut) }}</span>
+          <div class="prix">{{ r.prixTotal | number:'1.2-2' }} TND</div>
+        </div>
+
+        <div class="col-lg-2 text-lg-right">
+          <ng-container *ngIf="aAnnuler !== r.id">
+            <button type="button" class="btn btn-outline-primary btn-sm mb-1" *ngIf="r.statut === 'CONFIRMEE'"
+                    (click)="basculerInvitations(r)">
+              {{ ouvert === r.id ? 'Fermer' : 'Inviter' }}
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm mb-1" *ngIf="peutAnnuler(r)"
+                    (click)="demanderAnnulation(r.id)">Annuler</button>
+          </ng-container>
+
+          <div class="confirm" *ngIf="aAnnuler === r.id">
+            <small class="d-block mb-1">Annuler cette réservation ?</small>
+            <button type="button" class="btn btn-danger btn-sm" [disabled]="annulationEnCours"
+                    (click)="confirmerAnnulation(r)">Oui, annuler</button>
+            <button type="button" class="btn btn-link btn-sm text-muted" (click)="aAnnuler = null">Non</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panneau d'invitations -->
+      <div class="invitations" *ngIf="ouvert === r.id">
+        <hr>
+        <div class="row">
+          <div class="col-lg-6 mb-3">
+            <label class="lbl" for="adresses-{{ r.id }}">Adresses email des invités</label>
+            <textarea id="adresses-{{ r.id }}" rows="4" class="form-control"
+                      placeholder="amine@exemple.com, sarra@exemple.com"
+                      [(ngModel)]="saisie" name="saisie-{{ r.id }}"></textarea>
+            <small class="text-muted">
+              Séparez les adresses par une virgule ou un retour à la ligne.
+              Places restantes : <strong>{{ placesRestantes(r) }}</strong> sur {{ r.nbParticipants }}.
+            </small>
+            <div class="text-danger small mt-1" *ngIf="adressesInvalides.length">
+              Adresse invalide : {{ adressesInvalides.join(', ') }}
+            </div>
+            <div class="text-danger small mt-1" *ngIf="adresses.length > placesRestantes(r)">
+              Trop d'invités : {{ adresses.length }} pour {{ placesRestantes(r) }} place(s) restante(s).
+            </div>
+
+            <div class="alert alert-danger py-2 mt-2" *ngIf="invitationError">{{ invitationError }}</div>
+            <div class="alert alert-success py-2 mt-2" *ngIf="invitationInfo">{{ invitationInfo }}</div>
+
+            <button type="button" class="btn btn-primary btn-sm mt-2" [disabled]="!peutEnvoyer(r)" (click)="envoyer(r)">
+              <span class="spinner-border spinner-border-sm mr-1" *ngIf="envoiEnCours"></span>
+              Envoyer {{ adresses.length || '' }} invitation{{ adresses.length > 1 ? 's' : '' }}
+            </button>
+          </div>
+
+          <div class="col-lg-6 mb-3">
+            <span class="lbl">Historique</span>
+            <div class="text-muted small" *ngIf="loadingInvitations">Chargement...</div>
+            <div class="text-muted small" *ngIf="!loadingInvitations && invitations.length === 0">
+              Aucune invitation envoyée pour l'instant.
+            </div>
+            <ul class="histo" *ngIf="invitations.length">
+              <li *ngFor="let i of invitations">
+                <span class="mail">{{ i.emailInvite }}</span>
+                <span class="env" [class.ok]="i.statutEnvoi === 'ENVOYEE'" [class.ko]="i.statutEnvoi === 'ECHEC'">
+                  {{ i.statutEnvoi === 'ENVOYEE' ? 'Envoyée' : 'Échec' }}
+                </span>
+                <small class="text-muted">{{ i.dateEnvoi | date:'dd/MM HH:mm' }}</small>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

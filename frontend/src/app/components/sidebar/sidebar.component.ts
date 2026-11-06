@@ -14,6 +14,7 @@ export const ROUTES: RouteInfo[] = [
   { path: '/user-profile', title: 'Mon profil', icon: 'ni-single-02 text-yellow', class: '' },
   { path: '/salles', title: 'Salles', icon: 'ni-building text-blue', class: '' },
   { path: '/reservations/disponibilites', title: 'Disponibilités', icon: 'ni-calendar-grid-58 text-orange', class: '' },
+  { path: '/reservations/mes', title: 'Mes réservations', icon: 'ni-collection text-info', class: '' },
   // à venir : Salles, Disponibilités, Mes réservations, Calendrier  (CLIENT et ADMIN)
   // à venir : Toutes les réservations, Gestion des salles, Équipements, Utilisateurs  (ADMIN)
 ];
