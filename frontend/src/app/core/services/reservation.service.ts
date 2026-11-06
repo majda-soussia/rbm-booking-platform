@@ -31,4 +31,16 @@ export class ReservationService {
   inviter(id: number, invites: InviteRequest[]): Observable<Invitation[]> {
     return this.http.post<Invitation[]>(`${this.url}/${id}/invitations`, { invites });
   }
+    /** Toutes les réservations (réservé à l'admin côté backend). */
+  all(): Observable<Reservation[]> {
+    return this.http.get<Reservation[]>(this.url);
+  }
+
+  confirmer(id: number): Observable<Reservation> {
+    return this.http.put<Reservation>(`${this.url}/${id}/confirmer`, {});
+  }
+
+  refuser(id: number): Observable<Reservation> {
+    return this.http.put<Reservation>(`${this.url}/${id}/refuser`, {});
+  }
 }
