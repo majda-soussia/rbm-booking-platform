@@ -49,18 +49,18 @@ public class SecurityConfig {
                 .accessDeniedHandler((req, res, ex) ->
                         writeJson(res, HttpServletResponse.SC_FORBIDDEN,
                                 "Accès refusé : vous n'avez pas les droits nécessaires")))
-            .authorizeHttpRequests(auth -> auth
+                        .authorizeHttpRequests(auth -> auth
                 // Public
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
-                .requestMatchers(HttpMethod.DELETE, "/api/reservations/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()   // photos (balises <img>)
 
                 // Admin uniquement
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
+                .requestMatchers("/api/dashboard/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/reservations").hasRole("ADMIN")   // toutes les réservations
                 .requestMatchers(HttpMethod.PUT, "/api/reservations/*/confirmer", "/api/reservations/*/refuser").hasRole("ADMIN")
-                .requestMatchers("/api/dashboard/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/reservations/**").hasRole("ADMIN")
 
                 // Salles et équipements : lecture pour tous les connectés, écriture pour l'admin
                 .requestMatchers(HttpMethod.GET, "/api/salles/**", "/api/equipements/**").hasAnyRole("ADMIN", "CLIENT")
@@ -69,7 +69,11 @@ public class SecurityConfig {
                 // Réservations et invitations : tout utilisateur connecté (propriété vérifiée dans les services)
                 .requestMatchers("/api/reservations/**").hasAnyRole("ADMIN", "CLIENT")
 
-                .anyRequest().authenticated())
+                // Le reste de l'API (ex. /api/auth/me) exige une connexion
+                .requestMatchers("/api/**").authenticated()
+
+                // Fichiers Angular (index.html, js, css, images) servis par Spring Boot
+                .anyRequest().permitAll())
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

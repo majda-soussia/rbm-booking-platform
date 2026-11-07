@@ -1,0 +1,70 @@
+<div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <h1 class="text-white mb-1">Calendrier</h1>
+    <p class="text-light mb-0" *ngIf="auth.isAdmin">Toutes les réservations, avec leurs détails.</p>
+    <p class="text-light mb-0" *ngIf="!auth.isAdmin">Vos réservations et les créneaux déjà occupés.</p>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+  <div class="card mb-3">
+    <div class="card-body py-3">
+      <div class="row align-items-center">
+        <div class="col-lg-4 mb-2 mb-lg-0">
+          <select class="form-control" [(ngModel)]="salleId" (ngModelChange)="changerSalle()" name="salle">
+            <option [ngValue]="null">Toutes les salles</option>
+            <option *ngFor="let s of salles" [ngValue]="s.id">{{ s.nom }}</option>
+          </select>
+        </div>
+        <div class="col-lg-8 legende">
+          <span class="item" *ngFor="let l of legende"><i [style.background]="l.couleur"></i>{{ l.label }}</span>
+          <span class="item" *ngIf="!auth.isAdmin"><i [style.background]="legendeOccupe"></i>Occupé (autre client)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <full-calendar #calendar [options]="options"></full-calendar>
+    </div>
+  </div>
+
+  <!-- Détail de l'événement sélectionné -->
+  <div class="card detail mt-3" *ngIf="selection">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start">
+        <h3 class="mb-2">{{ selection.id === null ? 'Créneau occupé' : selection.titre }}</h3>
+        <button type="button" class="btn btn-link text-muted p-0" (click)="selection = null">Fermer</button>
+      </div>
+
+      <div class="ligne"><span>Salle</span><strong>{{ selection.salleNom }}</strong></div>
+      <div class="ligne">
+        <span>Date</span>
+        <strong>{{ selection.dateDebut | date:'EEEE dd/MM/yyyy' }}</strong>
+      </div>
+      <div class="ligne">
+        <span>Horaires</span>
+        <strong>{{ selection.dateDebut | date:'HH:mm' }} – {{ selection.dateFin | date:'HH:mm' }}</strong>
+      </div>
+      <ng-container *ngIf="selection.id !== null">
+        <div class="ligne"><span>Statut</span><strong>{{ libelle(selection.statut) }}</strong></div>
+        <div class="ligne" *ngIf="selection.clientNom"><span>Client</span><strong>{{ selection.clientNom }}</strong></div>
+        <div class="ligne" *ngIf="selection.mine && !auth.isAdmin">
+          <span>Réservation</span><strong>La vôtre</strong>
+        </div>
+      </ng-container>
+
+      <p class="text-muted small mt-2 mb-0" *ngIf="selection.id === null">
+        Cette salle est réservée à ce moment-là. Les détails sont visibles uniquement par le client concerné et par l'administrateur.
+      </p>
+      <div class="mt-3" *ngIf="selection.id !== null">
+        <a class="btn btn-primary btn-sm" routerLink="/admin/reservations" *ngIf="auth.isAdmin">Gérer les réservations</a>
+        <a class="btn btn-primary btn-sm" routerLink="/reservations/mes" *ngIf="!auth.isAdmin">Mes réservations</a>
+      </div>
+    </div>
+  </div>
+</div>

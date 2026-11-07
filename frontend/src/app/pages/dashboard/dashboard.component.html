@@ -1,369 +1,142 @@
-<div class="header bg-gradient-danger pb-8 pt-5 pt-md-8">
+<div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
   <div class="container-fluid">
-    <div class="header-body">
-      <!-- Card stats -->
-      <div class="row">
-        <div class="col-xl-3 col-lg-6">
-          <div class="card card-stats mb-4 mb-xl-0">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">Traffic</h5>
-                  <span class="h2 font-weight-bold mb-0">350,897</span>
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
-                    <i class="fas fa-chart-bar"></i>
-                  </div>
-                </div>
-              </div>
-              <p class="mt-3 mb-0 text-muted text-sm">
-                <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                <span class="text-nowrap">Since last month</span>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-3 col-lg-6">
-          <div class="card card-stats mb-4 mb-xl-0">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">New users</h5>
-                  <span class="h2 font-weight-bold mb-0">2,356</span>
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
-                    <i class="fas fa-chart-pie"></i>
-                  </div>
-                </div>
-              </div>
-              <p class="mt-3 mb-0 text-muted text-sm">
-                <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i> 3.48%</span>
-                <span class="text-nowrap">Since last week</span>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-3 col-lg-6">
-          <div class="card card-stats mb-4 mb-xl-0">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">Sales</h5>
-                  <span class="h2 font-weight-bold mb-0">924</span>
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
-                    <i class="fas fa-users"></i>
-                  </div>
-                </div>
-              </div>
-              <p class="mt-3 mb-0 text-muted text-sm">
-                <span class="text-warning mr-2"><i class="fas fa-arrow-down"></i> 1.10%</span>
-                <span class="text-nowrap">Since yesterday</span>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-3 col-lg-6">
-          <div class="card card-stats mb-4 mb-xl-0">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">Performance</h5>
-                  <span class="h2 font-weight-bold mb-0">49,65%</span>
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-info text-white rounded-circle shadow">
-                    <i class="fas fa-percent"></i>
-                  </div>
-                </div>
-              </div>
-              <p class="mt-3 mb-0 text-muted text-sm">
-                <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 12%</span>
-                <span class="text-nowrap">Since last month</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <h1 class="text-white mb-1">Bonjour {{ (auth.user$ | async)?.prenom }}</h1>
+    <p class="text-light mb-0" *ngIf="auth.isAdmin">Voici l'activité de la plateforme.</p>
+    <p class="text-light mb-0" *ngIf="!auth.isAdmin">Retrouvez vos réservations et trouvez une salle.</p>
   </div>
 </div>
+
 <div class="container-fluid mt--7">
-  <div class="row">
-    <div class="col-xl-8 mb-5 mb-xl-0">
-      <div class="card bg-gradient-default shadow">
-        <div class="card-header bg-transparent">
-          <div class="row align-items-center">
-            <div class="col">
-              <h6 class="text-uppercase text-light ls-1 mb-1">Overview</h6>
-              <h2 class="text-white mb-0">Sales value</h2>
-            </div>
-            <div class="col">
-              <ul class="nav nav-pills justify-content-end">
-                <li class="nav-item mr-2 mr-md-0" data-toggle="chart" data-target="#chart-sales"  (click)="data=datasets[0];updateOptions()">
-                  <a href="javascript:void(0)" class="nav-link py-2 px-3" [ngClass]="{'active':clicked===true}" data-toggle="tab" (click)="clicked=true;clicked1=false">
-                    <span class="d-none d-md-block">Month</span>
-                    <span class="d-md-none">M</span>
-                  </a>
-                </li>
-                <li class="nav-item" data-toggle="chart" data-target="#chart-sales"  (click)="data=datasets[1];updateOptions()">
-                  <a href="javascript:void(0)" class="nav-link py-2 px-3" [ngClass]="{'active':clicked1===true}" data-toggle="tab" (click)="clicked=false;clicked1=true">
-                    <span class="d-none d-md-block">Week</span>
-                    <span class="d-md-none">W</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="card-body">
-          <!-- Chart -->
-          <div class="chart">
-            <!-- Chart wrapper -->
-            <canvas id="chart-sales" class="chart-canvas"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-4">
-      <div class="card shadow">
-        <div class="card-header bg-transparent">
-          <div class="row align-items-center">
-            <div class="col">
-              <h6 class="text-uppercase text-muted ls-1 mb-1">Performance</h6>
-              <h2 class="mb-0">Total orders</h2>
-            </div>
-          </div>
-        </div>
-        <div class="card-body">
-          <!-- Chart -->
-          <div class="chart">
-            <canvas id="chart-orders" class="chart-canvas"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+  <div class="text-center py-6" *ngIf="loading">
+    <span class="spinner-border text-primary" role="status"></span>
   </div>
-  <div class="row mt-5">
-    <div class="col-xl-8 mb-5 mb-xl-0">
-      <div class="card shadow">
-        <div class="card-header border-0">
-          <div class="row align-items-center">
-            <div class="col">
-              <h3 class="mb-0">Page visits</h3>
+
+  <!-- ============ ADMINISTRATEUR ============ -->
+  <ng-container *ngIf="stats && auth.isAdmin">
+
+    <div class="row">
+      <div class="col-xl-3 col-md-6 mb-4">
+        <a routerLink="/admin/reservations" class="stat attention" [class.vide]="stats.reservationsEnAttente === 0">
+          <span class="lbl">À traiter</span>
+          <span class="val">{{ stats.reservationsEnAttente }}</span>
+          <span class="sub">demande{{ stats.reservationsEnAttente > 1 ? 's' : '' }} en attente</span>
+        </a>
+      </div>
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat">
+          <span class="lbl">Confirmées à venir</span>
+          <span class="val">{{ stats.confirmeesAVenir }}</span>
+          <span class="sub">sur {{ stats.reservationsConfirmees }} confirmée{{ stats.reservationsConfirmees > 1 ? 's' : '' }} au total</span>
+        </div>
+      </div>
+      <div class="col-xl-3 col-md-6 mb-4">
+        <a routerLink="/admin/salles" class="stat">
+          <span class="lbl">Salles</span>
+          <span class="val">{{ stats.sallesActives }}<small> / {{ stats.totalSalles }}</small></span>
+          <span class="sub">actives</span>
+        </a>
+      </div>
+      <div class="col-xl-3 col-md-6 mb-4">
+        <a routerLink="/admin/utilisateurs" class="stat">
+          <span class="lbl">Clients</span>
+          <span class="val">{{ stats.totalClients }}</span>
+          <span class="sub">comptes clients</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-7 mb-4">
+        <div class="card h-100">
+          <div class="card-header"><h3 class="mb-0">Répartition des réservations</h3></div>
+          <div class="card-body">
+            <p class="text-muted" *ngIf="totalReservations === 0">Aucune réservation pour l'instant.</p>
+
+            <div class="barre-ligne" *ngIf="totalReservations > 0">
+              <span class="nom">En attente</span>
+              <div class="piste"><div class="rempli attente" [style.width.%]="part(stats.reservationsEnAttente)"></div></div>
+              <span class="n">{{ stats.reservationsEnAttente }}</span>
             </div>
-            <div class="col text-right">
-              <a href="#!" class="btn btn-sm btn-primary">See all</a>
+            <div class="barre-ligne" *ngIf="totalReservations > 0">
+              <span class="nom">Confirmées</span>
+              <div class="piste"><div class="rempli confirmee" [style.width.%]="part(stats.reservationsConfirmees)"></div></div>
+              <span class="n">{{ stats.reservationsConfirmees }}</span>
+            </div>
+            <div class="barre-ligne" *ngIf="totalReservations > 0">
+              <span class="nom">Refusées</span>
+              <div class="piste"><div class="rempli refusee" [style.width.%]="part(stats.reservationsRefusees)"></div></div>
+              <span class="n">{{ stats.reservationsRefusees }}</span>
+            </div>
+            <div class="barre-ligne" *ngIf="totalReservations > 0">
+              <span class="nom">Annulées</span>
+              <div class="piste"><div class="rempli annulee" [style.width.%]="part(stats.reservationsAnnulees)"></div></div>
+              <span class="n">{{ stats.reservationsAnnulees }}</span>
             </div>
           </div>
         </div>
-        <div class="table-responsive">
-          <!-- Projects table -->
-          <table class="table align-items-center table-flush">
-            <thead class="thead-light">
-              <tr>
-                <th scope="col">Page name</th>
-                <th scope="col">Visitors</th>
-                <th scope="col">Unique users</th>
-                <th scope="col">Bounce rate</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">
-                  /argon/
-                </th>
-                <td>
-                  4,569
-                </td>
-                <td>
-                  340
-                </td>
-                <td>
-                  <i class="fas fa-arrow-up text-success mr-3"></i> 46,53%
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">
-                  /argon/index.html
-                </th>
-                <td>
-                  3,985
-                </td>
-                <td>
-                  319
-                </td>
-                <td>
-                  <i class="fas fa-arrow-down text-warning mr-3"></i> 46,53%
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">
-                  /argon/charts.html
-                </th>
-                <td>
-                  3,513
-                </td>
-                <td>
-                  294
-                </td>
-                <td>
-                  <i class="fas fa-arrow-down text-warning mr-3"></i> 36,49%
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">
-                  /argon/tables.html
-                </th>
-                <td>
-                  2,050
-                </td>
-                <td>
-                  147
-                </td>
-                <td>
-                  <i class="fas fa-arrow-up text-success mr-3"></i> 50,87%
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">
-                  /argon/profile.html
-                </th>
-                <td>
-                  1,795
-                </td>
-                <td>
-                  190
-                </td>
-                <td>
-                  <i class="fas fa-arrow-down text-danger mr-3"></i> 46,53%
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </div>
-    </div>
-    <div class="col-xl-4">
-      <div class="card shadow">
-        <div class="card-header border-0">
-          <div class="row align-items-center">
-            <div class="col">
-              <h3 class="mb-0">Social traffic</h3>
-            </div>
-            <div class="col text-right">
-              <a href="#!" class="btn btn-sm btn-primary">See all</a>
-            </div>
+
+      <div class="col-lg-5 mb-4">
+        <div class="card h-100 ca">
+          <div class="card-body">
+            <span class="lbl">Chiffre d'affaires confirmé</span>
+            <div class="montant">{{ stats.chiffreAffaires | number:'1.2-2' }} <small>TND</small></div>
+            <p class="text-muted small mb-3">Somme des prix des réservations confirmées. Paiement sur place ou par virement.</p>
+            <a routerLink="/calendrier" class="btn btn-primary btn-sm">Voir le calendrier</a>
+            <a routerLink="/admin/reservations" class="btn btn-outline-primary btn-sm">Gérer les demandes</a>
           </div>
         </div>
-        <div class="table-responsive">
-          <!-- Projects table -->
-          <table class="table align-items-center table-flush">
-            <thead class="thead-light">
-              <tr>
-                <th scope="col">Referral</th>
-                <th scope="col">Visitors</th>
-                <th scope="col"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">
-                  Facebook
-                </th>
-                <td>
-                  1,480
-                </td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <span class="mr-2">60%</span>
-                    <div>
-                      <div class="progress">
-                        <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">
-                  Facebook
-                </th>
-                <td>
-                  5,480
-                </td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <span class="mr-2">70%</span>
-                    <div>
-                      <div class="progress">
-                        <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width: 70%;"></div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">
-                  Google
-                </th>
-                <td>
-                  4,807
-                </td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <span class="mr-2">80%</span>
-                    <div>
-                      <div class="progress">
-                        <div class="progress-bar bg-gradient-primary" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"></div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">
-                  Instagram
-                </th>
-                <td>
-                  3,678
-                </td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <span class="mr-2">75%</span>
-                    <div>
-                      <div class="progress">
-                        <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">
-                  twitter
-                </th>
-                <td>
-                  2,645
-                </td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <span class="mr-2">30%</span>
-                    <div>
-                      <div class="progress">
-                        <div class="progress-bar bg-gradient-warning" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" style="width: 30%;"></div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ============ CLIENT ============ -->
+  <ng-container *ngIf="!loading && !auth.isAdmin && !error">
+
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="stat"><span class="lbl">À venir</span><span class="val">{{ nbAVenir }}</span><span class="sub">réservation{{ nbAVenir > 1 ? 's' : '' }}</span></div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="stat"><span class="lbl">En attente</span><span class="val">{{ nbEnAttente }}</span><span class="sub">de validation</span></div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="stat"><span class="lbl">Confirmées</span><span class="val">{{ nbConfirmees }}</span><span class="sub">au total</span></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-7 mb-4">
+        <div class="card h-100">
+          <div class="card-header"><h3 class="mb-0">Ma prochaine réservation</h3></div>
+          <div class="card-body" *ngIf="prochaine as p; else aucune">
+            <h4 class="mb-1">{{ p.titre }}</h4>
+            <p class="text-muted mb-2">{{ p.salleNom }} · {{ p.nbParticipants }} participant{{ p.nbParticipants > 1 ? 's' : '' }}</p>
+            <p class="mb-1"><strong>{{ p.dateDebut | date:'EEEE dd MMMM yyyy' }}</strong></p>
+            <p class="mb-3">{{ p.dateDebut | date:'HH:mm' }} – {{ p.dateFin | date:'HH:mm' }} · {{ p.prixTotal | number:'1.2-2' }} TND
+              · <em>{{ libelle(p.statut) }}</em></p>
+            <a routerLink="/reservations/mes" class="btn btn-outline-primary btn-sm">Voir mes réservations</a>
+          </div>
+          <ng-template #aucune>
+            <div class="card-body text-muted">Aucune réservation à venir.</div>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="col-lg-5 mb-4">
+        <div class="card h-100">
+          <div class="card-header"><h3 class="mb-0">Réserver une salle</h3></div>
+          <div class="card-body">
+            <p class="text-muted">Choisissez un créneau, nous vous montrons les salles libres avec leur tarif.</p>
+            <a routerLink="/reservations/disponibilites" class="btn btn-primary btn-sm">Rechercher une salle</a>
+            <a routerLink="/salles" class="btn btn-outline-primary btn-sm">Voir les salles</a>
+            <a routerLink="/calendrier" class="btn btn-outline-primary btn-sm">Calendrier</a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </ng-container>
 </div>

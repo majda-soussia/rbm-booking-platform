@@ -18,7 +18,7 @@ frontend/.sass-cache/
 # Journaux
 *.log
 npm-debug.log*
-
+node_modules/
 # IDE / OS
 .idea/
 .vscode/

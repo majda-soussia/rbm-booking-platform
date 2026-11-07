@@ -1,0 +1,51 @@
+// Palette Room & Event Booking : bleu et blanc
+$rbm-blue-dark: #0b1d4a;
+$rbm-blue: #1d4ed8;
+$rbm-blue-light: #2f7bea;
+
+// Bandeau coloré des pages (Argon utilise ces classes, en violet ou rouge à l'origine)
+.bg-gradient-primary,
+.bg-gradient-danger {
+  background: linear-gradient(160deg, $rbm-blue-dark 0%, $rbm-blue 60%, $rbm-blue-light 100%) !important;
+}
+
+// Boutons et liens principaux
+.btn-primary {
+  background-color: $rbm-blue;
+  border-color: $rbm-blue;
+
+  &:hover:not(:disabled) {
+    background-color: darken($rbm-blue, 6%);
+    border-color: darken($rbm-blue, 6%);
+  }
+
+  &:focus,
+  &:active {
+    background-color: darken($rbm-blue, 8%);
+    border-color: darken($rbm-blue, 8%);
+    box-shadow: 0 0 0 3px rgba($rbm-blue, 0.25);
+  }
+}
+
+.btn-outline-primary {
+  color: $rbm-blue;
+  border-color: $rbm-blue;
+
+  &:hover:not(:disabled) {
+    color: #fff;
+    background-color: $rbm-blue;
+    border-color: $rbm-blue;
+  }
+}
+
+.text-primary { color: $rbm-blue !important; }
+a { color: $rbm-blue; }
+
+// Cartes : coins arrondis et ombre douce
+.card {
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(11, 29, 74, 0.08);
+}
+
+// Fond général de l'application
+.main-content { background-color: #f4f7fc; }

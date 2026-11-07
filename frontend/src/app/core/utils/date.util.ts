@@ -31,3 +31,8 @@ export function minutesBetween(debut: string, fin: string): number {
 export function isPast(date: string, time: string): boolean {
   return new Date(`${date}T${time}:00`).getTime() < Date.now();
 }
+/** Date locale au format attendu par le backend : "2026-12-01T14:00:00" (sans fuseau). */
+export function dateToLocalIso(d: Date): string {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}

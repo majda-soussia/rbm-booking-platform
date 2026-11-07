@@ -1,0 +1,58 @@
+.legende {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+
+  @media (min-width: 992px) { justify-content: flex-end; }
+
+  .item {
+    display: inline-flex;
+    align-items: center;
+    margin: 0.2rem 0 0.2rem 1rem;
+    font-size: 0.8rem;
+    color: #525f7f;
+
+    i { display: inline-block; width: 12px; height: 12px; margin-right: 0.4rem; border-radius: 3px; }
+  }
+}
+
+.detail {
+  border-left: 4px solid #1d4ed8;
+
+  .ligne {
+    display: flex;
+    justify-content: space-between;
+    max-width: 380px;
+    padding: 0.25rem 0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f1f3f9;
+
+    span { color: #8898aa; }
+    strong { color: #32325d; text-transform: capitalize; }
+  }
+}
+
+// FullCalendar est rendu en dehors de la vue du composant : ::ng-deep nécessaire
+:host ::ng-deep {
+  .fc { font-size: 0.85rem; }
+  .fc-toolbar-title { font-size: 1.15rem !important; font-weight: 700; color: #32325d; text-transform: capitalize; }
+  .fc a { color: inherit; }
+  .fc-daygrid-block-event .fc-event-title,
+  .fc-daygrid-block-event .fc-event-time,
+  .fc-timegrid-event .fc-event-main { color: #fff; }
+
+  .fc .fc-button-primary {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    text-transform: capitalize;
+
+    &:hover { background: #1740b0; border-color: #1740b0; }
+    &:disabled { opacity: 0.55; }
+    &.fc-button-active { background: #0b1d4a; border-color: #0b1d4a; }
+    &:focus { box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.25); }
+  }
+
+  .fc-event { cursor: pointer; padding: 1px 3px; }
+  .fc-event.barre .fc-event-title { text-decoration: line-through; opacity: 0.8; }
+  .fc-day-today { background: rgba(29, 78, 216, 0.06) !important; }
+}

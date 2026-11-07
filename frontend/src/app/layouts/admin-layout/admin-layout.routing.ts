@@ -15,6 +15,7 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'maps',           component: MapsComponent },
     { path: 'salles', loadChildren: () => import('../../features/salles/salles.module').then(m => m.SallesModule) },
     { path: 'reservations', loadChildren: () => import('../../features/reservations/reservations.module').then(m => m.ReservationsModule) },
+    { path: 'calendrier', loadChildren: () => import('../../features/calendrier/calendrier.module').then(m => m.CalendrierModule) },
     {
   path: 'admin',
   canActivate: [RoleGuard],

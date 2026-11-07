@@ -1,0 +1,59 @@
+$blue: #1d4ed8;
+
+.lbl {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8898aa;
+}
+
+.stat {
+  display: block;
+  height: 100%;
+  padding: 1.25rem 1.4rem;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(11, 29, 74, 0.1);
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  .val { display: block; margin: 0.2rem 0; font-size: 2rem; font-weight: 700; color: #32325d; line-height: 1.1; }
+  .val small { font-size: 1rem; font-weight: 600; color: #8898aa; }
+  .sub { font-size: 0.82rem; color: #8898aa; }
+
+  &:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(11, 29, 74, 0.16); }
+
+  &.attention { border-left: 5px solid #fb6340; }
+  &.attention .val { color: #fb6340; }
+  &.attention.vide { border-left-color: #2dce89; }
+  &.attention.vide .val { color: #2dce89; }
+}
+
+div.stat:hover { transform: none; box-shadow: 0 6px 20px rgba(11, 29, 74, 0.1); }
+
+.barre-ligne {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.9rem;
+
+  .nom { width: 95px; font-size: 0.85rem; font-weight: 600; color: #525f7f; }
+  .n { width: 36px; text-align: right; font-weight: 700; color: #32325d; }
+
+  .piste { flex: 1; height: 10px; margin: 0 0.8rem; background: #eef1f8; border-radius: 999px; overflow: hidden; }
+  .rempli { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
+  .attente { background: #fb6340; }
+  .confirmee { background: #2dce89; }
+  .refusee { background: #f5365c; }
+  .annulee { background: #8898aa; }
+}
+
+.ca .montant {
+  margin: 0.4rem 0 0.6rem;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: $blue;
+
+  small { font-size: 1rem; color: #8898aa; }
+}
