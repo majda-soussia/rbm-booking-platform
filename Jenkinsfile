@@ -83,7 +83,9 @@ pipeline {
 
         stage('Build image Docker') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:$BUILD_NUMBER -t $IMAGE_NAME:latest .'
+                retry(2) {
+                    sh 'docker build -t $IMAGE_NAME:$BUILD_NUMBER -t $IMAGE_NAME:latest .'
+                }
             }
         }
 
