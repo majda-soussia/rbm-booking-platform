@@ -1,14 +1,4 @@
 // Fond de page bleu (règle globale : le fond appartient à <body>, pas au composant)
-::ng-deep body.auth-blue {
-  background: linear-gradient(160deg, #0b1d4a 0%, #1747b5 55%, #2f7bea 100%) !important;
-  background-attachment: fixed !important;
-  min-height: 100vh;
-}
-
-// Le bandeau du haut devient transparent pour laisser voir le dégradé de la page
-.auth-hero {
-  background: transparent;
-}
 .auth-brand {
   display: inline-flex;
   align-items: center;

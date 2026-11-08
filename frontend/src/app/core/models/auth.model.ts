@@ -19,3 +19,13 @@ export interface AuthResponse {
   expiresInMs: number;
   user: User;
 }
+export interface ProfileUpdateRequest {
+  nom: string;
+  prenom: string;
+  tel: string | null;
+}
+
+export interface PasswordChangeRequest {
+  currentPassword: string;
+  newPassword: string;
+}

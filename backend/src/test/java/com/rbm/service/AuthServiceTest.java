@@ -2,7 +2,10 @@ package com.rbm.service;
 
 import com.rbm.dto.AuthResponse;
 import com.rbm.dto.LoginRequest;
+import com.rbm.dto.PasswordChangeRequest;
+import com.rbm.dto.ProfileUpdateRequest;
 import com.rbm.dto.RegisterRequest;
+import com.rbm.dto.UserResponse;
 import com.rbm.entity.ERole;
 import com.rbm.entity.Role;
 import com.rbm.entity.User;
@@ -139,5 +142,60 @@ class AuthServiceTest {
                 .isInstanceOf(AuthenticationFailedException.class)
                 .hasMessage("Email ou mot de passe incorrect");
         verifyNoInteractions(passwordEncoder);
+    }
+        @Test
+    @DisplayName("Profil : nom, prénom et téléphone modifiés ; email et rôles inchangés")
+    void profil_miseAJour() {
+        User u = utilisateur("sami@test.com", "HASH", ERole.CLIENT);
+        when(userRepository.findByEmail("sami@test.com")).thenReturn(Optional.of(u));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        UserResponse res = service.updateProfile("sami@test.com", new ProfileUpdateRequest("Ben Ali", "Sami", "  "));
+
+        assertThat(res.nom()).isEqualTo("Ben Ali");
+        assertThat(res.tel()).isNull();
+        assertThat(res.email()).isEqualTo("sami@test.com");
+        assertThat(res.roles()).containsExactly(ERole.CLIENT);
+    }
+
+    @Test
+    @DisplayName("Mot de passe : changé et haché quand l'ancien est correct")
+    void motDePasse_ok() {
+        User u = utilisateur("sami@test.com", "HASH", ERole.CLIENT);
+        when(userRepository.findByEmail("sami@test.com")).thenReturn(Optional.of(u));
+        when(passwordEncoder.matches("ancien1234", "HASH")).thenReturn(true);
+        when(passwordEncoder.matches("nouveau1234", "HASH")).thenReturn(false);
+        when(passwordEncoder.encode("nouveau1234")).thenReturn("NEWHASH");
+
+        service.changePassword("sami@test.com", new PasswordChangeRequest("ancien1234", "nouveau1234"));
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(captor.capture());
+        assertThat(captor.getValue().getPassword()).isEqualTo("NEWHASH");
+    }
+
+    @Test
+    @DisplayName("Mot de passe : refusé si l'ancien est incorrect")
+    void motDePasse_ancienFaux() {
+        User u = utilisateur("sami@test.com", "HASH", ERole.CLIENT);
+        when(userRepository.findByEmail("sami@test.com")).thenReturn(Optional.of(u));
+        when(passwordEncoder.matches("faux", "HASH")).thenReturn(false);
+
+        assertThatThrownBy(() -> service.changePassword("sami@test.com", new PasswordChangeRequest("faux", "nouveau1234")))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("incorrect");
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("Mot de passe : le nouveau doit différer de l'ancien")
+    void motDePasse_identique() {
+        User u = utilisateur("sami@test.com", "HASH", ERole.CLIENT);
+        when(userRepository.findByEmail("sami@test.com")).thenReturn(Optional.of(u));
+        when(passwordEncoder.matches("meme12345", "HASH")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.changePassword("sami@test.com", new PasswordChangeRequest("meme12345", "meme12345")))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("différent");
     }
 }

@@ -31,3 +31,12 @@ a { color: $rbm-blue; }
 
 // Fond général de l'application
 .main-content { background-color: #f4f7fc; }
+// Fond de page des écrans de connexion et d'inscription
+// (la classe auth-blue est posée sur <body> par les composants login et register)
+body.auth-blue {
+  background: linear-gradient(160deg, #0b1d4a 0%, #1747b5 55%, #2f7bea 100%) !important;
+  background-attachment: fixed !important;
+  min-height: 100vh;
+}
+
+.auth-hero { background: transparent; }

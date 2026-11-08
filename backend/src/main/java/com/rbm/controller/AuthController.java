@@ -2,6 +2,8 @@ package com.rbm.controller;
 
 import com.rbm.dto.AuthResponse;
 import com.rbm.dto.LoginRequest;
+import com.rbm.dto.PasswordChangeRequest;
+import com.rbm.dto.ProfileUpdateRequest;
 import com.rbm.dto.RegisterRequest;
 import com.rbm.dto.UserResponse;
 import com.rbm.service.AuthService;
@@ -32,5 +34,16 @@ public class AuthController {
     @GetMapping("/me")
     public UserResponse me(Authentication authentication) {
         return service.me(authentication.getName());
+    }
+        @PutMapping("/me")
+    public UserResponse updateMe(Authentication authentication, @Valid @RequestBody ProfileUpdateRequest req) {
+        return service.updateProfile(authentication.getName(), req);
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<Void> changePassword(Authentication authentication,
+                                               @Valid @RequestBody PasswordChangeRequest req) {
+        service.changePassword(authentication.getName(), req);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -2,6 +2,8 @@ package com.rbm.service;
 
 import com.rbm.dto.AuthResponse;
 import com.rbm.dto.LoginRequest;
+import com.rbm.dto.PasswordChangeRequest;
+import com.rbm.dto.ProfileUpdateRequest;
 import com.rbm.dto.RegisterRequest;
 import com.rbm.dto.UserResponse;
 import com.rbm.entity.ERole;
@@ -87,5 +89,29 @@ public class AuthService {
     private UserResponse toUserResponse(User u) {
         Set<ERole> roles = u.getRoles().stream().map(Role::getLibelle).collect(Collectors.toSet());
         return new UserResponse(u.getId(), u.getEmail(), u.getTel(), u.getNom(), u.getPrenom(), roles);
+    }
+        @Transactional
+    public UserResponse updateProfile(String email, ProfileUpdateRequest req) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable : " + email));
+        user.setNom(req.nom().trim());
+        user.setPrenom(req.prenom().trim());
+        user.setTel(req.tel() == null || req.tel().isBlank() ? null : req.tel().trim());
+        return toUserResponse(userRepository.save(user));   // l'email et les rôles ne changent pas ici
+    }
+
+    @Transactional
+    public void changePassword(String email, PasswordChangeRequest req) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable : " + email));
+        // 409 et non 401 : côté Angular, un 401 signifie « session expirée » et déconnecterait l'utilisateur
+        if (!passwordEncoder.matches(req.currentPassword(), user.getPassword())) {
+            throw new BusinessException("Le mot de passe actuel est incorrect");
+        }
+        if (passwordEncoder.matches(req.newPassword(), user.getPassword())) {
+            throw new BusinessException("Le nouveau mot de passe doit être différent de l'ancien");
+        }
+        user.setPassword(passwordEncoder.encode(req.newPassword()));
+        userRepository.save(user);
     }
 }

@@ -7,7 +7,7 @@ import { environment } from '../../../environments/environment';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
 import { RoleName, User } from '../models/user.model';
 import { TokenService } from './token.service';
-
+import { ProfileUpdateRequest, PasswordChangeRequest } from '../models/auth.model';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
@@ -76,5 +76,17 @@ export class AuthService {
       return null;
     }
     return this.tokens.getUser();
+  }
+    updateProfile(request: ProfileUpdateRequest): Observable<User> {
+    return this.http.put<User>(`${this.url}/me`, request).pipe(
+      tap(user => {
+        this.tokens.saveUser(user);
+        this.userSubject.next(user);   // le nom affiché dans la barre du haut se met à jour
+      })
+    );
+  }
+
+  changePassword(request: PasswordChangeRequest): Observable<void> {
+    return this.http.put<void>(`${this.url}/password`, request);
   }
 }

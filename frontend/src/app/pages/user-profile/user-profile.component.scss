@@ -1,0 +1,58 @@
+$blue: #1d4ed8;
+
+.lbl {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #8898aa;
+}
+
+.ligne {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.7rem 0;
+  font-size: 0.92rem;
+  border-bottom: 1px solid #f1f3f9;
+
+  span { color: #8898aa; }
+  strong { color: #32325d; }
+}
+
+.identite {
+  .avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 84px;
+    height: 84px;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #0b1d4a, #2f7bea);
+    border-radius: 50%;
+    box-shadow: 0 8px 20px rgba(29, 78, 216, 0.3);
+  }
+
+  .role {
+    display: inline-block;
+    padding: 0.15rem 0.7rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #5b6477;
+    background: #e9ecf3;
+    border-radius: 999px;
+
+    &.admin { color: #fff; background: $blue; }
+  }
+
+  .mail { font-weight: 600; color: #525f7f; word-break: break-all; }
+
+  .stats {
+    .n { display: block; font-size: 1.4rem; font-weight: 700; color: #32325d; }
+    .l { font-size: 0.75rem; color: #8898aa; }
+  }
+}
