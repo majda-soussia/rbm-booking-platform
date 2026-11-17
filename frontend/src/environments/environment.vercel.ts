@@ -1,10 +1,5 @@
-"vercel": {
-  "fileReplacements": [
-    { "replace": "src/environments/environment.ts", "with": "src/environments/environment.vercel.ts" }
-  ],
-  "outputHashing": "all",
-  "optimization": true,
-  "sourceMap": false,
-  "extractLicenses": true,
-  "buildOptimizer": true
-}
+export const environment = {
+  production: true,
+  apiUrl: 'https://rbm-booking-platform.onrender.com/api',
+  baseUrl: 'https://rbm-booking-platform.onrender.com'
+};

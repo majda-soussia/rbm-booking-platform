@@ -1,9 +1,5 @@
 {
   "installCommand": "npm ci --legacy-peer-deps",
   "buildCommand": "npx ng build --configuration production",
-  "outputDirectory": "dist",
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "https://rbm-api.onrender.com/api/:path*" },
-    { "source": "/uploads/:path*", "destination": "https://rbm-api.onrender.com/uploads/:path*" }
-  ]
+  "outputDirectory": "dist"
 }
