@@ -38,6 +38,10 @@ services:
       MAIL_SMTP_AUTH: ${MAIL_SMTP_AUTH:-false}
       MAIL_STARTTLS: ${MAIL_STARTTLS:-false}
       MAIL_FROM: ${MAIL_FROM:-no-reply@rbm.com}
+      MAIL_PROVIDER: ${MAIL_PROVIDER:-smtp}
+      BREVO_API_KEY: ${BREVO_API_KEY:-}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
+      EMAIL_VERIFICATION_REQUIRED: ${EMAIL_VERIFICATION_REQUIRED:-true}
       APP_DEMO_DATA: ${APP_DEMO_DATA:-false}
       DEMO_CLIENT_PASSWORD: ${DEMO_CLIENT_PASSWORD:-}
     ports:
