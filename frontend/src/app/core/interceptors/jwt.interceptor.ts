@@ -12,8 +12,8 @@ export class JwtInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const token = this.tokens.getToken();
     const versNotreApi = req.url.startsWith(environment.apiUrl);
-    const publique = req.url.includes('/auth/login') || req.url.includes('/auth/register');
-
+    const publique = ['/auth/login', '/auth/register', '/auth/verify-email', '/auth/resend-verification']
+  .some(chemin => req.url.includes(chemin));
     if (token && versNotreApi && !publique) {
       req = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
     }

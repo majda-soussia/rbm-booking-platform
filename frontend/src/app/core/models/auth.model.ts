@@ -29,3 +29,8 @@ export interface PasswordChangeRequest {
   currentPassword: string;
   newPassword: string;
 }
+export interface RegisterResponse {
+  message: string;
+  verificationRequise: boolean;
+  session: AuthResponse | null;
+}

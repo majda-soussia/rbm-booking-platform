@@ -2,3 +2,17 @@
 @import '~@fullcalendar/common/main';
 @import '~@fullcalendar/daygrid/main';
 @import '~@fullcalendar/timegrid/main';
+/* Fond des pages Connexion et Inscription */
+body.auth-blue {
+  background: linear-gradient(160deg, #0b1d4a 0%, #1747b5 55%, #2f7bea 100%) !important;
+  background-attachment: fixed !important;
+  min-height: 100vh;
+}
+
+body.auth-blue .main-content,
+body.auth-blue .auth-hero {
+  background: transparent;
+}
+
+body.auth-blue .auth-hero h1 { color: #fff; font-weight: 700; }
+body.auth-blue .auth-hero p  { color: rgba(255, 255, 255, 0.85); }

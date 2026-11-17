@@ -13,6 +13,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   showPassword = false;
   loading = false;
   error = '';
+  infoMessage = '';
 
   private readonly labels = ['Très faible', 'Faible', 'Moyen', 'Bon', 'Excellent'];
 
@@ -56,7 +57,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
     const { confirm, ...data } = this.model;
     this.auth.register({ ...data, tel: data.tel || undefined }).subscribe({
-      next: () => this.router.navigateByUrl('/dashboard'),   // le backend connecte directement le nouveau client
+      next: res => {
+      if (res.verificationRequise) { this.infoMessage = res.message; }
+      else { this.router.navigate(['/dashboard']); }
+    },
       error: (err: Error) => {
         this.error = err.message;
         this.loading = false;

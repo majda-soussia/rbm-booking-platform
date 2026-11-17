@@ -5,6 +5,7 @@ import com.rbm.dto.LoginRequest;
 import com.rbm.dto.PasswordChangeRequest;
 import com.rbm.dto.ProfileUpdateRequest;
 import com.rbm.dto.RegisterRequest;
+import com.rbm.dto.RegisterResponse;
 import com.rbm.dto.UserResponse;
 import com.rbm.entity.ERole;
 import com.rbm.entity.Role;
@@ -12,6 +13,7 @@ import com.rbm.entity.User;
 import com.rbm.event.UserRegisteredEvent;
 import com.rbm.exception.AuthenticationFailedException;
 import com.rbm.exception.BusinessException;
+import com.rbm.exception.EmailNotVerifiedException;
 import com.rbm.repository.RoleRepository;
 import com.rbm.repository.UserRepository;
 import com.rbm.security.JwtService;
@@ -24,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -44,6 +47,7 @@ class AuthServiceTest {
     @Mock RoleRepository roleRepository;
     @Mock PasswordEncoder passwordEncoder;
     @Mock ApplicationEventPublisher eventPublisher;
+    @Mock EmailVerificationService emailVerificationService;
 
     private final JwtService jwtService =
             new JwtService("test-secret-key-with-at-least-32-characters-long", 60_000);
@@ -52,7 +56,8 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new AuthService(userRepository, roleRepository, passwordEncoder, jwtService, eventPublisher);
+        service = new AuthService(userRepository, roleRepository, passwordEncoder,
+                jwtService, emailVerificationService, eventPublisher);
     }
 
     private User utilisateur(String email, String hash, ERole role) {
@@ -63,11 +68,13 @@ class AuthServiceTest {
         u.setNom("Test");
         u.setPrenom("User");
         u.setRoles(new HashSet<>(Set.of(new Role(1L, role))));
-        return u;
+        return u;   // emailVerifie = null : compte ancien, considéré comme vérifié
     }
 
+    // ---------------------------------------------------------------- inscription
+
     @Test
-    @DisplayName("Inscription : compte CLIENT, mot de passe haché, email normalisé, token valide, admin notifié")
+    @DisplayName("Inscription sans vérification d'email : compte CLIENT, mot de passe haché, email normalisé, token valide, admin notifié")
     void inscription_ok() {
         when(userRepository.existsByEmail("sami@test.com")).thenReturn(false);
         when(roleRepository.findByLibelle(ERole.CLIENT)).thenReturn(Optional.of(new Role(1L, ERole.CLIENT)));
@@ -78,9 +85,12 @@ class AuthServiceTest {
             return u;
         });
 
-        AuthResponse res = service.register(
+        // « verificationRequise » vaut false dans un test unitaire (@Value n'est pas évalué)
+        RegisterResponse reponse = service.register(
                 new RegisterRequest("  Sami@Test.com ", "motdepasse1", "20123456", "Ben Ali", "Sami"));
+        AuthResponse res = reponse.session();
 
+        assertThat(reponse.verificationRequise()).isFalse();
         assertThat(res.user().email()).isEqualTo("sami@test.com");
         assertThat(res.user().roles()).containsExactly(ERole.CLIENT);
         assertThat(res.type()).isEqualTo("Bearer");
@@ -90,7 +100,37 @@ class AuthServiceTest {
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(captor.capture());
         assertThat(captor.getValue().getPassword()).isEqualTo("HASH");   // jamais le mot de passe en clair
+        assertThat(captor.getValue().estVerifie()).isTrue();
 
+        verify(eventPublisher).publishEvent(any(UserRegisteredEvent.class));
+        verifyNoInteractions(emailVerificationService);
+    }
+
+    @Test
+    @DisplayName("Inscription avec vérification : compte non vérifié, lien envoyé, aucune session ouverte")
+    void inscription_avecVerification() {
+        ReflectionTestUtils.setField(service, "verificationRequise", true);
+        when(userRepository.existsByEmail("sami@test.com")).thenReturn(false);
+        when(roleRepository.findByLibelle(ERole.CLIENT)).thenReturn(Optional.of(new Role(1L, ERole.CLIENT)));
+        when(passwordEncoder.encode("motdepasse1")).thenReturn("HASH");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(5L);
+            return u;
+        });
+
+        RegisterResponse res = service.register(
+                new RegisterRequest("sami@test.com", "motdepasse1", null, "Ben Ali", "Sami"));
+
+        assertThat(res.verificationRequise()).isTrue();
+        assertThat(res.session()).isNull();                 // pas de token tant que l'email n'est pas vérifié
+        assertThat(res.message()).contains("sami@test.com");
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(captor.capture());
+        assertThat(captor.getValue().estVerifie()).isFalse();
+
+        verify(emailVerificationService).envoyerLien(any(User.class));
         verify(eventPublisher).publishEvent(any(UserRegisteredEvent.class));
     }
 
@@ -106,10 +146,13 @@ class AuthServiceTest {
 
         verify(userRepository, never()).save(any(User.class));
         verifyNoInteractions(eventPublisher);
+        verifyNoInteractions(emailVerificationService);
     }
 
+    // ------------------------------------------------------------------ connexion
+
     @Test
-    @DisplayName("Connexion : token contenant les rôles de l'utilisateur")
+    @DisplayName("Connexion : token contenant les rôles de l'utilisateur (compte ancien, sans indicateur de vérification)")
     void connexion_ok() {
         when(userRepository.findByEmail("admin@rbm.com"))
                 .thenReturn(Optional.of(utilisateur("admin@rbm.com", "HASH", ERole.ADMIN)));
@@ -120,6 +163,30 @@ class AuthServiceTest {
         assertThat(jwtService.isValid(res.token())).isTrue();
         assertThat(jwtService.extractEmail(res.token())).isEqualTo("admin@rbm.com");
         assertThat(jwtService.extractRoles(res.token())).containsExactly("ADMIN");
+    }
+
+    @Test
+    @DisplayName("Connexion refusée si l'email n'est pas encore vérifié")
+    void connexion_emailNonVerifie() {
+        User u = utilisateur("sami@test.com", "HASH", ERole.CLIENT);
+        u.setEmailVerifie(false);
+        when(userRepository.findByEmail("sami@test.com")).thenReturn(Optional.of(u));
+        when(passwordEncoder.matches("motdepasse1", "HASH")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.login(new LoginRequest("sami@test.com", "motdepasse1")))
+                .isInstanceOf(EmailNotVerifiedException.class);
+    }
+
+    @Test
+    @DisplayName("Compte non vérifié + mauvais mot de passe : même erreur qu'ailleurs (on ne révèle pas l'état du compte)")
+    void connexion_nonVerifie_mauvaisMotDePasse() {
+        User u = utilisateur("sami@test.com", "HASH", ERole.CLIENT);
+        u.setEmailVerifie(false);
+        when(userRepository.findByEmail("sami@test.com")).thenReturn(Optional.of(u));
+        when(passwordEncoder.matches("faux", "HASH")).thenReturn(false);
+
+        assertThatThrownBy(() -> service.login(new LoginRequest("sami@test.com", "faux")))
+                .isInstanceOf(AuthenticationFailedException.class);
     }
 
     @Test
@@ -143,7 +210,10 @@ class AuthServiceTest {
                 .hasMessage("Email ou mot de passe incorrect");
         verifyNoInteractions(passwordEncoder);
     }
-        @Test
+
+    // --------------------------------------------------------------------- profil
+
+    @Test
     @DisplayName("Profil : nom, prénom et téléphone modifiés ; email et rôles inchangés")
     void profil_miseAJour() {
         User u = utilisateur("sami@test.com", "HASH", ERole.CLIENT);

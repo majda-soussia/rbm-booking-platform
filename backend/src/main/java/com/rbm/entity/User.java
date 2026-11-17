@@ -22,6 +22,12 @@ public class User {
     private String tel;
     private String nom;
     private String prenom;
+    @Column(name = "email_verifie")
+    private Boolean emailVerifie;   // null = compte antérieur à cette fonctionnalité : considéré vérifié
+
+    public boolean estVerifie() {
+        return emailVerifie == null || emailVerifie;
+    }
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",

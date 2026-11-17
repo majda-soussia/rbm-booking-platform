@@ -79,7 +79,14 @@
               {{ loading ? 'Connexion en cours...' : 'Se connecter' }}
             </button>
           </form>
+<div *ngIf="nonVerifie" class="alert alert-warning mt-3 mb-0">
+  Votre adresse email n'est pas encore vérifiée.
+  <a href="javascript:void(0)" (click)="renvoyer()"><b>Renvoyer l'email</b></a>
+</div>
 
+<div *ngIf="infoMessage" class="alert alert-success mt-3 mb-0">
+  {{ infoMessage }}
+</div>
           <p class="auth-switch">
             Pas encore de compte ? <a [routerLink]="['/register']">Créer un compte</a>
           </p>

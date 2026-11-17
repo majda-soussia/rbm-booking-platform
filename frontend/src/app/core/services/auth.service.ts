@@ -4,10 +4,12 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
 import { RoleName, User } from '../models/user.model';
 import { TokenService } from './token.service';
-import { ProfileUpdateRequest, PasswordChangeRequest } from '../models/auth.model';
+import {
+  AuthResponse, LoginRequest, RegisterRequest, RegisterResponse,
+  ProfileUpdateRequest, PasswordChangeRequest
+} from '../models/auth.model';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
@@ -35,9 +37,14 @@ export class AuthService {
       .pipe(tap(res => this.startSession(res)));
   }
 
-  register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.url}/register`, request)
-      .pipe(tap(res => this.startSession(res)));
+  register(payload: any): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${environment.apiUrl}/auth/register`, payload).pipe(
+      tap(res => {
+        if (res.session) {
+          // reprends ici ce que faisait l'ancien register pour enregistrer le token
+        }
+      })
+    );
   }
 
   logout(redirect: boolean = true): void {
@@ -88,5 +95,13 @@ export class AuthService {
 
   changePassword(request: PasswordChangeRequest): Observable<void> {
     return this.http.put<void>(`${this.url}/password`, request);
+  }
+   verifyEmail(token: string) {
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/verify-email`, { token });
+  }
+
+  // AJOUT
+  resendVerification(email: string) {
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/resend-verification`, { email });
   }
 }

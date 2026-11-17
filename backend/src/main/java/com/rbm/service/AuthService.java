@@ -5,6 +5,7 @@ import com.rbm.dto.LoginRequest;
 import com.rbm.dto.PasswordChangeRequest;
 import com.rbm.dto.ProfileUpdateRequest;
 import com.rbm.dto.RegisterRequest;
+import com.rbm.dto.RegisterResponse;
 import com.rbm.dto.UserResponse;
 import com.rbm.entity.ERole;
 import com.rbm.entity.Role;
@@ -22,7 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
-
+import com.rbm.dto.RegisterResponse;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -37,41 +38,60 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final ApplicationEventPublisher eventPublisher;   // <-- AJOUTE CETTE LIGNE
-        @Transactional
-    public AuthResponse register(RegisterRequest req) {
-        String email = req.email().trim().toLowerCase();
-        if (userRepository.existsByEmail(email)) {
-            throw new BusinessException("Cet email est déjà utilisé : " + email);
-        }
-        Role clientRole = roleRepository.findByLibelle(ERole.CLIENT)
-                .orElseThrow(() -> new ResourceNotFoundException("Rôle introuvable : CLIENT"));
-
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(req.password()));
-        user.setTel(req.tel());
-        user.setNom(req.nom());
-        user.setPrenom(req.prenom());
-        user.setRoles(new HashSet<>(Set.of(clientRole)));   // jamais de rôle venant du client
-
-        User saved = userRepository.save(user);
-        eventPublisher.publishEvent(new com.rbm.event.UserRegisteredEvent(
-                saved.getEmail(), saved.getNom(), saved.getPrenom(), saved.getTel(),
-                java.time.LocalDateTime.now()));
-        return buildResponse(saved);
+    private final EmailVerificationService emailVerificationService;
+    private final ApplicationEventPublisher eventPublisher; 
+    @org.springframework.beans.factory.annotation.Value("${app.verification.required:true}")
+    private boolean verificationRequise;  // <-- AJOUTE CETTE LIGNE
+    @Transactional
+public RegisterResponse register(RegisterRequest req) {
+    String email = req.email().trim().toLowerCase();
+    if (userRepository.existsByEmail(email)) {
+        throw new BusinessException("Cet email est déjà utilisé : " + email);
     }
+    Role clientRole = roleRepository.findByLibelle(ERole.CLIENT)
+            .orElseThrow(() -> new ResourceNotFoundException("Rôle introuvable : CLIENT"));
+
+    User user = new User();
+    user.setEmail(email);
+    user.setPassword(passwordEncoder.encode(req.password()));
+    user.setTel(req.tel());
+    user.setNom(req.nom());
+    user.setPrenom(req.prenom());
+    user.setRoles(new HashSet<>(Set.of(clientRole)));
+    user.setEmailVerifie(!verificationRequise);
+    User saved = userRepository.save(user);
+
+    eventPublisher.publishEvent(new com.rbm.event.UserRegisteredEvent(
+            saved.getEmail(), saved.getNom(), saved.getPrenom(), saved.getTel(),
+            java.time.LocalDateTime.now()));
+
+    if (verificationRequise) {
+        emailVerificationService.envoyerLien(saved);
+        return new RegisterResponse(
+                "Compte créé. Un email de confirmation vient d'être envoyé à " + saved.getEmail()
+                        + ". Cliquez sur le lien pour activer votre compte.",
+                true, null);
+    }
+    return new RegisterResponse("Compte créé.", false, buildResponse(saved));
+}
 
     @Transactional(readOnly = true)
-    public AuthResponse login(LoginRequest req) {
-        String email = req.email().trim().toLowerCase();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(AuthenticationFailedException::new);
-        if (!passwordEncoder.matches(req.password(), user.getPassword())) {
-            throw new AuthenticationFailedException();
-        }
-        return buildResponse(user);
+public AuthResponse login(LoginRequest req) {
+    String email = req.email().trim().toLowerCase();
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(AuthenticationFailedException::new);
+
+    if (!passwordEncoder.matches(req.password(), user.getPassword())) {
+        throw new AuthenticationFailedException();
     }
+
+    // AJOUT : bloquer la connexion tant que l'email n'est pas vérifié
+    if (!user.estVerifie()) {
+        throw new com.rbm.exception.EmailNotVerifiedException();
+    }
+
+    return buildResponse(user);
+}
 
     @Transactional(readOnly = true)
     public UserResponse me(String email) {
@@ -114,4 +134,5 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(req.newPassword()));
         userRepository.save(user);
     }
+    
 }

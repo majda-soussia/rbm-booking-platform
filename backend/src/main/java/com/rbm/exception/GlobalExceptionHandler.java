@@ -110,4 +110,10 @@ public class GlobalExceptionHandler {
         body.put("message", message);
         return ResponseEntity.status(status).body(body);
     }
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    public ResponseEntity<Map<String, Object>> emailNonVerifie(EmailNotVerifiedException ex) {
+        ResponseEntity<Map<String, Object>> reponse = build(HttpStatus.FORBIDDEN, ex.getMessage());
+        reponse.getBody().put("code", "EMAIL_NOT_VERIFIED");
+        return reponse;
+    }
 }

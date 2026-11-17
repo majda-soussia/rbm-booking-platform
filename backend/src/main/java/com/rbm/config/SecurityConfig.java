@@ -52,7 +52,8 @@ public class SecurityConfig {
                         .authorizeHttpRequests(auth -> auth
                 // Public
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                .requestMatchers("/api/auth/login", "/api/auth/register",
+                 "/api/auth/verify-email", "/api/auth/resend-verification").permitAll()
                 .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()   // photos (balises <img>)
 
                 // Admin uniquement

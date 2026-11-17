@@ -28,7 +28,7 @@
           <h2 class="auth-title">Inscription</h2>
           <p class="auth-subtitle">Quelques informations suffisent pour créer votre espace client.</p>
 
-          <form #f="ngForm" (ngSubmit)="f.valid && submit()" novalidate>
+          <form #f="ngForm" *ngIf="!infoMessage"  (ngSubmit)="f.valid && submit()" novalidate>
 
             <div class="alert alert-danger py-2" role="alert" *ngIf="error">{{ error }}</div>
 
@@ -152,6 +152,10 @@
               {{ loading ? 'Création en cours...' : 'Créer mon compte' }}
             </button>
           </form>
+          <div *ngIf="infoMessage" class="alert alert-success mt-3">
+  {{ infoMessage }}
+  <div class="mt-2"><a routerLink="/login">Aller à la connexion</a></div>
+</div>
 
           <p class="auth-switch">
             Vous avez déjà un compte ? <a [routerLink]="['/login']">Se connecter</a>
