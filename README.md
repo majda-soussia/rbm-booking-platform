@@ -11,10 +11,8 @@ Le cœur fonctionnel est la **détection des conflits de réservation** : une sa
 
 | | |
 |---|---|
-| Application | `https://<ADRESSE-VERCEL>` *(à compléter)* |
+| Application | https://rbm-booking-platform.vercel.app/#|
 | API | `https://rbm-booking-platform.onrender.com` |
-| Compte client de démonstration | `client.demo@rbm.com` |
-| Compte administrateur | communiqué séparément à l'enseignante (jamais dans ce dépôt) |
 
 > L'hébergement gratuit met l'API en veille après quelques minutes d'inactivité : **la première requête peut prendre environ une minute**. Les photos de salles téléversées sur cet hébergement ne sont pas conservées après un redémarrage du serveur.
 
