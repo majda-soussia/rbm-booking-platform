@@ -164,25 +164,7 @@ Application sur http://localhost:4200. Avec `ng serve`, définir `APP_BASE_URL=h
 
 ## Lancement avec Docker
 
-Créer un fichier `.env` à la racine (**non versionné**) à partir de cet exemple :
-
-```dotenv
-MYSQL_ROOT_PASSWORD=change-me
-MYSQL_DATABASE=rbm_db
-MYSQL_USER=rbm_user
-MYSQL_PASSWORD=change-me
-JWT_SECRET=une-chaine-aleatoire-d-au-moins-32-caracteres
-ADMIN_EMAIL=admin@rbm.com
-ADMIN_PASSWORD=change-me
-MAIL_HOST=host.docker.internal
-MAIL_PORT=1025
-MAIL_SMTP_AUTH=false
-MAIL_STARTTLS=false
-MAIL_FROM=no-reply@rbm.com
-APP_PORT=8082
-APP_BASE_URL=http://localhost:8082
-APP_DEMO_DATA=true
-DEMO_CLIENT_PASSWORD=change-me
+Créer un fichier `.env` à la racine
 ```
 
 ```bash
