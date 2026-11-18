@@ -200,9 +200,3 @@ Jenkins se lance dans Docker : `cd jenkins && docker compose up -d --build`. Les
 | ![Calendrier](docs/screenshots/05-calendrier.png) | ![Admin](docs/screenshots/06-admin-reservations.png) |
 | ![Tableau de bord](docs/screenshots/07-tableau-de-bord.png) | ![Pipeline Jenkins](docs/screenshots/08-pipeline-jenkins.png) |
 
-## Limites et pistes d'amélioration
-
-- Paiement en ligne hors périmètre (paiement sur place ou virement).
-- Révocation des tokens JWT, schéma de base géré par migrations (Flyway) plutôt que `ddl-auto: update`.
-- Génération de devis ou de factures PDF, fichier `.ics` joint aux invitations, email d'annulation aux invités.
-- Stockage des photos sur un service d'objets (S3) pour un hébergement sans disque persistant.
