@@ -1,202 +1,260 @@
 # Room & Event Booking (RBM)
 
-Application web de **location et de gestion de salles** (séminaires, formations, mariages, événements d'entreprise). Les clients consultent les salles, vérifient leur disponibilité sur un créneau, voient le prix et demandent une réservation. L'administrateur gère les salles, les équipements et les utilisateurs, et valide les demandes.
-
+Application web de **location et de gestion de salles** (séminaires, formations, mariages, événements d'entreprise).
+Les clients consultent les salles, vérifient leur disponibilité et demandent une réservation ; l'administrateur gère les salles, valide les demandes et suit l'activité.
 Le cœur fonctionnel est la **détection des conflits de réservation** : une salle ne peut pas être réservée deux fois sur des créneaux qui se chevauchent.
 
-> Projet de la formation **FullStack Spring Boot & Angular** (durée : 1 semaine).
-> Étudiante : Majda · Enseignante : Dr. Hanen Harbaoui
+> Projet de la formation **FullStack Spring Boot & Angular** — Étudiante : **Majda Soussia** — Enseignante : **Dr. Hanen Harbaoui**.
 
-## Accès à la démonstration
+---
 
-| | |
+## Démo en ligne
+
+| Élément | Adresse |
 |---|---|
-| Application | https://rbm-booking-platform.vercel.app/#|
-| API | `https://rbm-booking-platform.onrender.com` |
+| Application (Angular, Vercel) | https://rbm-booking-platform.vercel.app |
+| API (Spring Boot, Render) | https://rbm-booking-platform.onrender.com |
 
-> L'hébergement gratuit met l'API en veille après quelques minutes d'inactivité : **la première requête peut prendre environ une minute**. Les photos de salles téléversées sur cet hébergement ne sont pas conservées après un redémarrage du serveur.
+- L'hébergement est **gratuit** : après 15 minutes sans trafic, l'API se met en veille et la **première requête peut prendre environ une minute**. Ouvrez l'application, patientez, puis rechargez.
+- Comptes de démonstration : l'administrateur est `admin@rbm.com`. **Les mots de passe ne figurent pas dans ce dépôt** : ils sont communiqués séparément.
+- Les photos téléversées sur la version en ligne sont **perdues quand l'API redémarre** (stockage éphémère de l'hébergeur gratuit).
+
+---
 
 ## Fonctionnalités
 
-**Client**
-- Consulter les salles (photo, tarif, capacité, équipements, localisation) avec filtres.
-- Rechercher les salles libres sur un créneau (par pas de 30 minutes, durée minimale 1 heure).
-- Réserver, avec le **prix total affiché avant l'envoi** (le serveur reste la seule source de vérité).
-- Consulter et annuler **ses** réservations (avant leur début), inviter des participants par email.
-- Calendrier : ses réservations en détail, les autres créneaux confirmés en « Occupé » (sans titre ni nom).
-- Modifier son profil et son mot de passe.
+### Client
+- Consulter les salles avec photos, tarifs, capacité, équipements ; filtrer par capacité et équipements.
+- Rechercher les salles libres sur un créneau.
+- Créer une demande de réservation (prix total affiché avant l'envoi, calculé définitivement par le serveur).
+- Consulter et annuler **ses** réservations (avant leur début).
+- Inviter des participants par email depuis une réservation confirmée.
+- Voir le calendrier : les créneaux occupés par les autres clients apparaissent sans titre ni nom.
+- Créer un compte avec **vérification de l'adresse email**, modifier son profil et son mot de passe.
 
-**Administrateur**
-- CRUD des salles (tarif, photo, activation), des équipements et des utilisateurs.
-- Voir toutes les réservations, **confirmer**, **refuser** ou **annuler**.
-- Calendrier global avec tous les détails, tableau de bord (compteurs, chiffre d'affaires).
-
-### Rôles et droits
-
-| Ressource | Admin | Client |
-|---|---|---|
-| Utilisateurs (CRUD) | Oui | Non |
-| Salles (CRUD, tarif, photo) | Oui | Lecture |
-| Équipements (CRUD) | Oui | Lecture |
-| Réservations : création | Oui | Oui |
-| Réservations : lecture | Toutes | Les siennes |
-| Réservations : confirmation / refus | Oui | Non |
-| Réservations : annulation | Toutes | Les siennes, avant le début |
-| Calendrier | Tous les détails | Créneaux occupés sans détails |
-| Tableau de bord | Oui | Non |
+### Administrateur
+- CRUD des salles (tarif et photo compris), des équipements et des utilisateurs.
+- Voir toutes les réservations, **confirmer ou refuser** les demandes en attente.
+- Calendrier global avec tous les détails, coloré par statut.
+- Tableau de bord avec compteurs.
 
 ### Règles de gestion (couvertes par des tests unitaires)
-
-1. `dateFin` strictement postérieure à `dateDebut`, et `dateDebut` pas dans le passé.
-2. Pas de chevauchement entre deux réservations **confirmées** d'une même salle : deux créneaux se chevauchent si `nouveauDebut < existantFin` **et** `nouveauFin > existantDebut` (un créneau qui commence exactement quand un autre se termine n'est pas un conflit).
-3. `nbParticipants` ne dépasse pas la capacité de la salle.
+1. `dateFin` strictement postérieure à `dateDebut` ; `dateDebut` non passée.
+2. Pas de chevauchement entre deux réservations **confirmées** d'une même salle (`nouveauDebut < existantFin` et `nouveauFin > existantDebut` ; un créneau qui commence quand un autre se termine n'est pas un conflit).
+3. `nbParticipants` ≤ capacité de la salle.
 4. Une salle désactivée ne peut pas être réservée.
-5. Workflow des statuts : `EN_ATTENTE` → `CONFIRMEE` ou `REFUSEE` ; annulation possible (`ANNULEE`) ; **la confirmation revérifie l'absence de conflit**.
+5. Workflow : `EN_ATTENTE` → `CONFIRMEE` ou `REFUSEE` ; annulation possible (`ANNULEE`) ; la confirmation revérifie l'absence de conflit.
 6. Une salle ayant des réservations futures confirmées ne peut pas être supprimée (seulement désactivée).
-7. Prix : `prixTotal = durée en heures × tarifHoraire`, calculé côté serveur et figé dans la réservation.
+7. Créneaux par pas de 30 minutes, durée minimale 1 heure ; `prixTotal = durée × tarifHoraire`, enregistré dans la réservation.
+
+---
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    U[Navigateur] -->|HTTPS| FE[Angular 14<br/>template Argon]
-    FE -->|API REST + JWT| API[Spring Boot<br/>Controller · Service · Repository · DTO]
-    API --> DB[(MySQL)]
-    API --> FS[Photos des salles<br/>volume / dossier uploads]
-    API -->|SMTP| MAIL[Emails<br/>invitations, notifications]
+```
+┌──────────────┐   HTTPS    ┌─────────────────────┐   JDBC (TLS)   ┌───────────────┐
+│  Navigateur  │──────────▶│  Angular (Vercel)    │               │               │
+└──────────────┘            │  /api, /uploads ─────┼──────────────▶│ Spring Boot   │──────▶ MySQL
+                            │  (redirections)      │               │ (Render)      │
+                            └─────────────────────┘               └──────┬────────┘
+                                                                          │ HTTPS
+                                                                          ▼
+                                                                  Brevo (emails)
 ```
 
-| Couche | Technologies |
-|---|---|
-| Backend | Java 17, Spring Boot 4.1 (Web, Data JPA, Security, Validation, Mail), JWT (jjwt), BCrypt, Lombok |
-| Frontend | Angular 14, template Argon Dashboard, FullCalendar 5 (guards, interceptors, services) |
-| Base de données | MySQL 8 (Docker) · MySQL/MariaDB de XAMPP (développement) · TiDB Cloud (hébergement cloud) |
-| Tests | JUnit 5, Mockito, AssertJ, H2 (tests de repository) |
-| CI/CD | Jenkins, SonarQube, Nexus, Docker, Docker Compose |
-| Hébergement | Docker Compose (VPS) · Render (API) + Vercel (interface) |
+- **Backend** : Spring Boot (Java 17), architecture en couches *Controller → Service → Repository → DTO*, Spring Security + **JWT**, mots de passe **BCrypt**, gestion globale des exceptions (`@RestControllerAdvice`).
+- **Frontend** : Angular (template Argon Dashboard adapté), routing par rôle, **Guards** (authentification, rôle), **Interceptor** (jeton JWT, erreurs 401/403), calendrier FullCalendar.
+- **Base de données** : MySQL.
+- **Conteneurisation** : `Dockerfile` multi-étapes (build Angular → intégration dans Spring Boot → `rbm.jar`), `docker-compose.yml`.
+- **CI/CD** : Jenkins (build, tests, SonarQube, Nexus, Docker, déploiement).
 
-### Sécurité
-
-- Mots de passe hachés avec **BCrypt**, jamais renvoyés par l'API.
-- Authentification **JWT** (durée de validité de 24 h), autorisation par rôle sur chaque endpoint.
-- Contrôle de **propriété** côté serveur : un client ne lit, n'annule et n'invite que sur ses propres réservations.
-- Les secrets (mots de passe, secret JWT) viennent de variables d'environnement ; le fichier `.env` n'est jamais versionné.
-- Limite connue : un token JWT reste valable jusqu'à son expiration, même après déconnexion ou changement de mot de passe (pas de liste de révocation).
-
-## Structure du dépôt
+### Structure du dépôt
 
 ```
 rbm/
-├── backend/            API Spring Boot (Maven, Java 17)
-├── frontend/           Application Angular
-├── jenkins/            Image et docker-compose de Jenkins (Node 16, client Docker)
-├── docs/               Captures d'écran et rapport de tests
-├── Dockerfile          Build multi-stage : Angular intégré au JAR Spring Boot
-├── docker-compose.yml  MySQL, application, (profil prod : Caddy ; profil dev : MailHog)
-├── Caddyfile           HTTPS automatique pour un déploiement sur VPS
-├── Jenkinsfile         Pipeline CI/CD
-└── .env.example        Modèle des variables d'environnement
+├── backend/            # API Spring Boot (+ Dockerfile pour l'hébergement de l'API seule)
+├── frontend/           # Application Angular (+ vercel.json)
+├── jenkins/            # Jenkins en Docker (Node 16, client Docker)
+├── docs/               # Captures d'écran, preuves de tests, collection Postman
+├── Dockerfile          # Image complète : Angular + Spring Boot
+├── docker-compose.yml  # MySQL + application (+ Caddy en profil « prod », MailHog en profil « dev »)
+├── Caddyfile           # HTTPS automatique pour un déploiement sur serveur
+└── Jenkinsfile         # Pipeline CI/CD
 ```
 
-## Lancer le projet
+---
 
-### Option 1 : avec Docker (recommandé)
+## API (aperçu)
 
-Prérequis : Docker Desktop.
+| Méthode | Route | Accès |
+|---|---|---|
+| POST | `/api/auth/register`, `/api/auth/login` | Public |
+| POST | `/api/auth/verify-email`, `/api/auth/resend-verification` | Public |
+| GET | `/api/auth/me` | Connecté |
+| GET | `/api/salles`, `/api/salles/disponibles?debut=&fin=&capacite=` | Connecté |
+| POST/PUT/DELETE | `/api/salles`, `POST /api/salles/{id}/photo` | Admin |
+| CRUD | `/api/equipements`, `/api/users` | Admin (lecture des équipements : connecté) |
+| POST | `/api/reservations` | Connecté |
+| GET | `/api/reservations/mes`, `/api/reservations/calendrier?debut=&fin=` | Connecté |
+| GET | `/api/reservations` | Admin |
+| PUT | `/api/reservations/{id}/confirmer`, `/refuser` | Admin |
+| PUT | `/api/reservations/{id}/annuler` | Propriétaire ou admin |
+| GET/POST | `/api/reservations/{id}/invitations` | Propriétaire ou admin |
+| GET | `/api/dashboard` | Admin |
+
+La collection Postman est dans `docs/`.
+
+---
+
+## Captures d'écran
+
+Les images sont dans `docs/screenshots/`.
+
+| | |
+|---|---|
+| ![Connexion](docs/screenshots/01-connexion.png) | ![Tableau de bord](docs/screenshots/02-dashboard.png) |
+| ![Salles](docs/screenshots/03-salles.png) | ![Disponibilités](docs/screenshots/04-disponibilites.png) |
+| ![Réservation](docs/screenshots/05-reservation.png) | ![Calendrier](docs/screenshots/06-calendrier.png) |
+| ![Administration](docs/screenshots/07-admin-reservations.png) | ![Email de vérification](docs/screenshots/08-email-verification.png) |
+
+### Intégration continue
+
+| | |
+|---|---|
+| ![Pipeline Jenkins](docs/screenshots/09-jenkins-pipeline.png) | ![SonarQube](docs/screenshots/10-sonarqube.png) |
+| ![Nexus](docs/screenshots/11-nexus.png) | ![Tests](docs/screenshots/12-tests.png) |
+
+---
+
+## Lancement en local
+
+### Prérequis
+Java 17, Node.js 16 ou 18, MySQL (par exemple XAMPP ou Docker), Docker Desktop (facultatif), Git.
+
+### 1. Base de données
+```sql
+CREATE DATABASE IF NOT EXISTS rbm_db CHARACTER SET utf8mb4;
+CREATE USER IF NOT EXISTS 'rbm_user'@'localhost' IDENTIFIED BY 'un-mot-de-passe';
+GRANT ALL PRIVILEGES ON rbm_db.* TO 'rbm_user'@'localhost';
+```
+
+### 2. Faux serveur mail (développement)
+```bash
+docker run -d --name mailhog -p 1025:1025 -p 8025:8025 mailhog/mailhog
+```
+Les emails (vérification de compte, invitations) sont consultables sur http://localhost:8025.
+
+### 3. Backend
+```bash
+cd backend
+# Variables : DB_URL, DB_USER, DB_PASSWORD, JWT_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD (voir application.yaml)
+./mvnw spring-boot:run
+```
+L'API écoute sur http://localhost:8080. Un compte administrateur est créé au premier démarrage.
+
+### 4. Frontend
+```bash
+cd frontend
+npm ci --legacy-peer-deps
+npx ng serve
+```
+Application sur http://localhost:4200. Avec `ng serve`, définir `APP_BASE_URL=http://localhost:4200` côté backend pour que le lien de l'email de vérification ouvre le bon site.
+
+---
+
+## Lancement avec Docker
+
+Créer un fichier `.env` à la racine (**non versionné**) à partir de cet exemple :
+
+```dotenv
+MYSQL_ROOT_PASSWORD=change-me
+MYSQL_DATABASE=rbm_db
+MYSQL_USER=rbm_user
+MYSQL_PASSWORD=change-me
+JWT_SECRET=une-chaine-aleatoire-d-au-moins-32-caracteres
+ADMIN_EMAIL=admin@rbm.com
+ADMIN_PASSWORD=change-me
+MAIL_HOST=host.docker.internal
+MAIL_PORT=1025
+MAIL_SMTP_AUTH=false
+MAIL_STARTTLS=false
+MAIL_FROM=no-reply@rbm.com
+APP_PORT=8082
+APP_BASE_URL=http://localhost:8082
+APP_DEMO_DATA=true
+DEMO_CLIENT_PASSWORD=change-me
+```
 
 ```bash
-cp .env.example .env        # PowerShell : Copy-Item .env.example .env
-# éditer .env : mots de passe, JWT_SECRET (32 caractères minimum), ADMIN_PASSWORD
 docker compose up -d --build
 ```
 
-L'application (interface et API) est disponible sur `http://localhost:8082` (variable `APP_PORT`). Pour recevoir les emails de test dans une interface (MailHog, `http://localhost:8025`) : `docker compose --profile dev up -d`.
+L'application est servie sur http://localhost:8082 (Angular intégré dans le JAR Spring Boot). Les données MySQL et les photos sont conservées dans des volumes Docker.
 
-`APP_DEMO_DATA=true` crée des salles, des équipements et un client de démonstration au premier démarrage, uniquement si la base ne contient aucune salle.
+Profils facultatifs :
+- `docker compose --profile prod up -d` : ajoute **Caddy** (HTTPS automatique, variable `DOMAIN`) pour un serveur public.
+- `docker compose --profile dev up -d` : ajoute **MailHog**.
 
-### Option 2 : en développement
-
-Prérequis : JDK 17, Node 16 (`16.20.2`), MySQL (XAMPP).
-
-```bash
-# Backend (http://localhost:8080) : MySQL doit être démarré
-cd backend
-./mvnw spring-boot:run
-
-# Frontend (http://localhost:4200)
-cd frontend
-npm install --legacy-peer-deps
-npm start
-```
-
-La base `rbm_db` est créée automatiquement. Les paramètres par défaut se trouvent dans `backend/src/main/resources/application.yaml`.
-
-### Variables d'environnement principales
-
-| Variable | Rôle |
-|---|---|
-| `DB_URL`, `DB_USER`, `DB_PASSWORD` | Connexion à la base |
-| `JWT_SECRET` | Secret de signature des tokens (32 caractères minimum) |
-| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Compte administrateur créé au démarrage |
-| `UPLOAD_DIR` | Dossier des photos de salles |
-| `CORS_ALLOWED_ORIGINS` | Origines autorisées (si l'interface et l'API sont sur des adresses différentes) |
-| `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_SMTP_AUTH`, `MAIL_STARTTLS`, `MAIL_FROM` | Envoi des emails |
-| `APP_BASE_URL` | Adresse de l'interface (liens dans les emails) |
-| `APP_DEMO_DATA`, `DEMO_CLIENT_PASSWORD` | Données de démonstration |
-| `PORT` | Port d'écoute imposé par certaines plateformes (défaut : 8080) |
-
-## API (extrait)
-
-| Méthode | Route | Description |
-|---|---|---|
-| POST | `/api/auth/register`, `/api/auth/login` | Inscription, connexion |
-| GET / PUT | `/api/auth/me`, `/api/auth/password` | Profil, changement de mot de passe |
-| GET | `/api/salles`, `/api/salles/disponibles?debut=&fin=&capacite=` | Salles, disponibilités |
-| POST / PUT / DELETE | `/api/salles`, `/api/salles/{id}` | Gestion des salles (admin) |
-| POST | `/api/salles/{id}/photo` | Photo d'une salle, JPG ou PNG, 2 Mo maximum (admin) |
-| GET / POST | `/api/reservations`, `/api/reservations/mes` | Réservations |
-| PUT | `/api/reservations/{id}/confirmer`, `/refuser`, `/annuler` | Changement de statut |
-| GET | `/api/reservations/calendrier?debut=&fin=` | Calendrier |
-| GET / POST | `/api/reservations/{id}/invitations` | Historique et envoi d'invitations |
-| GET | `/api/dashboard` | Compteurs (admin) |
-| CRUD | `/api/equipements`, `/api/users` | Gestion (admin) |
-
-Les erreurs sont renvoyées en JSON avec un message clair (par exemple « Salle déjà réservée sur ce créneau »).
+---
 
 ## Tests
 
 ```bash
 cd backend
-./mvnw test
+./mvnw clean test
 ```
 
-Les tests couvrent : la détection de conflit (chevauchement partiel, inclusion, créneaux adjacents, salle différente), les règles de gestion, le workflow des statuts, les droits par propriétaire, le calendrier masqué, le JWT, l'authentification et les notifications. **Nombre de tests : voir le rapport** `docs/Rapport-tests`. Une collection Postman est disponible dans `postman/`.
+72 tests (JUnit 5, Mockito, H2) : règles de gestion des réservations, détection de conflit (chevauchement partiel, inclusion, créneaux adjacents, salle différente), authentification, vérification d'email, invitations, tableau de bord. Les tests d'API ont été réalisés avec Postman (`docs/`).
+
+---
 
 ## CI/CD (Jenkins)
 
-Le `Jenkinsfile` exécute :
+Jenkins, SonarQube et Nexus tournent dans Docker sur le poste de développement.
 
-1. **Checkout** du dépôt ;
-2. **Build Maven et tests** (JUnit publiés) ;
-3. **Analyse SonarQube** ;
-4. **Publication du JAR sur Nexus** ;
-5. **Build Angular** (configuration de production) ;
-6. **Build de l'image Docker** ;
-7. **Déploiement** avec Docker Compose, suivi d'un contrôle (page d'accueil en 200, API protégée en 401).
+```bash
+cd jenkins && docker compose up -d --build     # Jenkins : http://localhost:8080
+docker start sonarqube nexus                    # SonarQube : :9000, Nexus : :8081
+```
 
-Jenkins se lance dans Docker : `cd jenkins && docker compose up -d --build`. Les identifiants `sonar-token`, `nexus-credentials` et `rbm-env` (fichier `.env`) sont enregistrés dans les Credentials de Jenkins et non dans le dépôt.
+Pipeline (`Jenkinsfile`) :
+
+| Étape | Rôle |
+|---|---|
+| Checkout | Récupération du code depuis GitHub |
+| Build Maven et tests | `mvnw clean verify`, résultats JUnit |
+| Analyse SonarQube | Qualité du code (jeton stocké dans les *Credentials*) |
+| Publication Nexus | Dépôt du JAR (`maven-snapshots`) |
+| Build Angular | `ng build --configuration production` |
+| Build image Docker | Image `rbm-app` |
+| Déploiement | `docker compose up -d`, puis contrôle de santé (accueil 200, API protégée 401) |
+
+Les secrets (jeton SonarQube, compte Nexus, fichier `.env`) sont enregistrés dans les *Credentials* de Jenkins, jamais dans le dépôt.
+
+---
 
 ## Déploiement
 
-- **VPS** : `docker compose --profile prod up -d --build` avec un `.env` propre au serveur (`DOMAIN=...`, `APP_BIND=127.0.0.1`). Caddy obtient automatiquement le certificat HTTPS.
-- **Cloud** : API Spring Boot sur Render (`backend/Dockerfile`), base compatible MySQL sur TiDB Cloud, interface Angular sur Vercel (`ng build --configuration vercel`).
+### Version en ligne (cloud)
+- **Frontend** : Vercel. Le fichier `frontend/vercel.json` redirige `/api` et `/uploads` vers l'API : le navigateur ne parle qu'à un seul domaine.
+- **API** : Render (service Docker construit depuis `backend/Dockerfile`).
+- **Base de données** : MySQL compatible hébergé (TiDB Cloud), connexion chiffrée.
+- **Emails** : Brevo par API HTTPS (le SMTP sortant est bloqué sur l'offre gratuite de l'hébergeur).
 
-## Captures d'écran
+### Serveur VPS
+Le `docker-compose.yml` fourni permet un déploiement sur un VPS Docker : MySQL avec volume persistant, application, et Caddy pour le HTTPS. Variables d'environnement dans un fichier `.env` propre au serveur.
 
-| | |
-|---|---|
-| ![Connexion](docs/screenshots/01-connexion.png) | ![Salles](docs/screenshots/02-salles.png) |
-| ![Disponibilités](docs/screenshots/03-disponibilites.png) | ![Réservation](docs/screenshots/04-reservation.png) |
-| ![Calendrier](docs/screenshots/05-calendrier.png) | ![Admin](docs/screenshots/06-admin-reservations.png) |
-| ![Tableau de bord](docs/screenshots/07-tableau-de-bord.png) | ![Pipeline Jenkins](docs/screenshots/08-pipeline-jenkins.png) |
+---
 
+## Sécurité
+
+- Mots de passe hachés (**BCrypt**), authentification **JWT** sans session côté serveur, autorisation par rôle (`ADMIN`, `CLIENT`).
+- Vérification de l'adresse email à l'inscription (jeton aléatoire, haché en base, valable 24 heures, usage unique).
+- Le client ne voit et n'annule que **ses** réservations ; le calendrier masque les informations des autres clients.
+- Aucune donnée secrète dans le dépôt : variables d'environnement (`.env` ignoré par Git).
+- Limite connue : la déconnexion supprime le jeton du navigateur, mais le jeton reste valable jusqu'à son expiration (24 h).
+
+
+## Crédits
+
+Interface basée sur le template **Argon Dashboard Angular** de Creative Tim (licence MIT).
